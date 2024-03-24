@@ -102,3 +102,4 @@ D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\refint\APICatalog
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\APICatalogo.pdb
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\APICatalogo.genruntimeconfig.cache
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\ref\APICatalogo.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\APICatalogo.sourcelink.json

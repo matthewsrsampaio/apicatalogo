@@ -12,6 +12,6 @@ namespace APICatalogo.Context
 
         //Definir o mapeamento objeto relacional
         public DbSet<Categoria>? Categorias { get; set; }
-        public  DbSet<Produto>? Produtos { get; set; }
+        public DbSet<Produto>? Produtos { get; set; }
     }
 }
