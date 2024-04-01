@@ -27,7 +27,7 @@ namespace ApiCatalogo.Models
         public string? ImagemUrl { get; set; }
         //Aqui estamos informando que uma categoria pode ter uma coleção de produto
         
-        ICollection<Produto>? Produtos { get; set; }
+        public ICollection<Produto>? Produtos { get; set; }
 
     }
 }  
