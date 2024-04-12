@@ -23,6 +23,10 @@ namespace APICatalogo.Controllers
         {
             var listaProdutos = _context.Categorias.Include(p => p.Produtos).ToList();
 
+            //Dessa forma aqui consigo retornar uma lista de categorias onde o ID é menor ou igual a 5. Massa né?
+            //Aaahh o professor falou que nunca é bom retornar uma lista completa. É sempre bom colocar filtros.
+            //var listaProdutos = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
+
             if (listaProdutos is null)
                 return BadRequest("Objeto não encontrado.");
 
@@ -32,12 +36,20 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _context.Categorias.ToList();
+            try
+            {
+                var categorias = _context.Categorias.AsNoTracking().ToList(); //Adicionei AsNoTracking() para a procura nao ser armazenada no cache(contexto). Pois é apenas uma consulta que não vai precisar do contexto(cache).
 
-            if (categorias is null)
-                return NotFound("Nenhuma categoria foi encontrada!");
+                if (categorias is null)
+                    return NotFound("Nenhuma categoria foi encontrada!");
 
-            return Ok(categorias);
+                return categorias;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Oops, algo deu errado.");
+            }
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
@@ -46,7 +58,7 @@ namespace APICatalogo.Controllers
             var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
 
             if (categoria is null)
-                return NotFound("Essa categoria não foi encontrada.");
+                return NotFound($"Essa categoria não foi encontrada. ID = {id}");
 
             return Ok(categoria);
         }

@@ -1,6 +1,7 @@
 ﻿using ApiCatalogo.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 [Table("Produtos")]
 public class Produto
@@ -32,5 +33,6 @@ public class Produto
     public int CategoriaId { get; set; }
 
     //Aqui em Categoria eu estou informando que Produto está mapeado para uma Categoria
+    [JsonIgnore] //vai ignorar a serialização dessa propriedade
     public Categoria? Categoria { get; set; }
 }
