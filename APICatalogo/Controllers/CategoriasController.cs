@@ -21,16 +21,24 @@ namespace APICatalogo.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            var listaProdutos = _context.Categorias.Include(p => p.Produtos).ToList();
+            try
+            {
+                var listaProdutos = _context.Categorias.Include(p => p.Produtos).AsNoTracking().ToList();  //Adicionei AsNoTracking() para a procura nao ser armazenada no cache(contexto). Pois é apenas uma consulta que não vai precisar do contexto(cache).
 
-            //Dessa forma aqui consigo retornar uma lista de categorias onde o ID é menor ou igual a 5. Massa né?
-            //Aaahh o professor falou que nunca é bom retornar uma lista completa. É sempre bom colocar filtros.
-            //var listaProdutos = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
+                //Dessa forma aqui consigo retornar uma lista de categorias onde o ID é menor ou igual a 5. Massa né?
+                //Aaahh o professor falou que nunca é bom retornar uma lista completa. É sempre bom colocar filtros.
+                //var listaProdutos = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
 
-            if (listaProdutos is null)
-                return BadRequest("Objeto não encontrado.");
+                if (listaProdutos is null)
+                    return BadRequest("Objeto não encontrado.");
 
-            return listaProdutos;
+                return listaProdutos;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Oops, algo deu errado.");
+            }
         }
 
         [HttpGet]
@@ -55,53 +63,87 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<IEnumerable<Categoria>> Get(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+            try
+            {
+                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
 
-            if (categoria is null)
-                return NotFound($"Essa categoria não foi encontrada. ID = {id}");
+                if (categoria is null)
+                    return NotFound($"Essa categoria não foi encontrada. ID = {id}");
 
-            return Ok(categoria);
+                return Ok(categoria);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Oops, algo deu errado.");
+            }
         }
 
         [HttpPost]
         public ActionResult Post(Categoria categoria)
         {
+            try
+            {
+                if (categoria is null)
+                    return BadRequest();
 
-            if (categoria is null)
-                return BadRequest();
+                var categoria_nome = _context.Categorias.FirstOrDefault(c => c.Nome == categoria.Nome);
 
-            var categoria_nome = _context.Categorias.FirstOrDefault(c => c.Nome == categoria.Nome);
+                _context.Categorias.Add(categoria);
+                _context.SaveChanges(); //Nesse momento, acabamos de salvar no banco.
 
-            _context.Categorias.Add(categoria);
-            _context.SaveChanges(); //Nesse momento, acabamos de salvar no banco.
-
-            return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
+                return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Oops, algo deu errado.");
+            }
         }
 
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Categoria categoria)
         {
-            if (id != categoria.CategoriaId)
-                return BadRequest("Categoria não encontrada.");
+            try
+            {
+                if (id != categoria.CategoriaId)
+                    return BadRequest("Categoria não encontrada.");
 
-            _context.Entry(categoria).State = EntityState.Modified; //Basicamente vai adicionar o estado modificado ao estado que está no banco.
-            _context.SaveChanges();
+                _context.Entry(categoria).State = EntityState.Modified; //Basicamente vai adicionar o estado modificado ao estado que está no banco.
+                _context.SaveChanges();
 
-            return Ok(categoria);
+                return Ok(categoria);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Oops, algo deu errado.");
+            }
+
+            
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+            try
+            {
+                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
 
-            if (categoria is null)
-                return NotFound("Categoria não encontrada.");
+                if (categoria is null)
+                    return NotFound("Categoria não encontrada.");
 
-            _context.Categorias.Remove(categoria);
-            _context.SaveChanges();
+                _context.Categorias.Remove(categoria);
+                _context.SaveChanges();
 
-            return Ok(categoria);
+                return Ok(categoria);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Oops, algo deu errado.");
+            }
         }
+
     }
 }
