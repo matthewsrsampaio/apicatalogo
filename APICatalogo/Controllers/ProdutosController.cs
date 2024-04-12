@@ -16,6 +16,27 @@ public class ProdutosController : ControllerBase
         _context = context;
     }
 
+    [HttpGet("primeiro")] // /Produtos/primeiro
+    public ActionResult<Produto> GetPrimeiro() //Esse método foi implementado só para exercitar o roteamento
+    {
+
+        try
+        {
+            var produto = _context.Produtos.FirstOrDefault();
+
+            if (produto is null)
+                return NotFound("Produto não encontrado");
+
+            return Ok(produto);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Oops, algo deu errado.");
+        }
+        
+    }
+
     [HttpGet]
     public ActionResult<IEnumerable<Produto>> Get()
      //Para usar NotFound é necessário envelopar a classe no método ActionResult
@@ -27,7 +48,7 @@ public class ProdutosController : ControllerBase
             if (produtos is null)
                 return NotFound("Produtos não encontrados!");
 
-            return produtos;
+            return Ok(produtos);
         }
         catch (Exception)
         {
@@ -47,7 +68,7 @@ public class ProdutosController : ControllerBase
             if (produto is null)
                 return NotFound("Produto não encontrado!");
 
-            return produto;
+            return Ok(produto);
         }
         catch (Exception)
         {
@@ -69,8 +90,8 @@ public class ProdutosController : ControllerBase
 
 
             //O método CreatedAtRouteResult lança o código 201 e acessa pelo nome ObterProduto os dados do produto inserido
-            return new CreatedAtRouteResult("ObterProduto", //Criamos essa rota nomeavel para buscar o produto pelo ID.
-                new { id = produto.ProdutoId }, produto);
+            return Ok(new CreatedAtRouteResult("ObterProduto", //Criamos essa rota nomeavel para buscar o produto pelo ID.
+                new { id = produto.ProdutoId }, produto));
         }
         catch (Exception)
         {
