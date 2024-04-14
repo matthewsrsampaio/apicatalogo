@@ -6,7 +6,7 @@ using Microsoft.OpenApi.Expressions;
 
 namespace APICatalogo.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class ProdutosController : ControllerBase
 {
@@ -16,10 +16,12 @@ public class ProdutosController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("primeiro")] // /Produtos/primeiro
+    // api/produtos/primeiro
+    [HttpGet("primeiro")]
+    // /primeiro
+    [HttpGet("/primeiro")]
     public ActionResult<Produto> GetPrimeiro() //Esse método foi implementado só para exercitar o roteamento
     {
-
         try
         {
             var produto = _context.Produtos.FirstOrDefault();
@@ -34,9 +36,9 @@ public class ProdutosController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError,
                 "Oops, algo deu errado.");
         }
-        
     }
 
+    // /api/produtos
     [HttpGet]
     public ActionResult<IEnumerable<Produto>> Get()
      //Para usar NotFound é necessário envelopar a classe no método ActionResult
@@ -57,11 +59,15 @@ public class ProdutosController : ControllerBase
         }
     }
 
-    [HttpGet("{id:int}", Name = "ObterProduto")] // "{id:int}") quer dizer que estou esperando um parâmetro do tipo inteiro chamado id
-    public ActionResult<Produto> Get(int id)
+    // /api/produtos/id                                                   // {nome=nomePadrao} significa que eu estou esperando um id/umaString, mas se a string não for passada ela receberá por padrão a string "nomePadrao"
+    [HttpGet("{id:int:min(1)}/{nome=nomePadrao}", Name = "ObterProduto")] // "{id:int}") quer dizer que estou esperando um parâmetro do tipo inteiro chamado id
+                                                                          // {id:int:min(1)} Estou criando uma restrição para que valores menores que 1 não sejam válidos. Pq? Pq dessa forma eu evito uma consulta desnecessária ao banco de dados.
+    public ActionResult<Produto> Get(int id, string nome)
     {
         try
         {
+            var nomeQualquer = nome;
+
             var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id); //FirstOrDefault vai atrás do primeiro id na tabela que se
                                                                                     //assemelha ao id  que está sendo passado no parâmtro.
                                                                                     //Caso não encontre nada esse 'método me retornará um null.
@@ -77,6 +83,7 @@ public class ProdutosController : ControllerBase
         }
     }
 
+    // /api/produtos
     [HttpPost]
     public ActionResult Post(Produto produto)
     {
@@ -101,6 +108,7 @@ public class ProdutosController : ControllerBase
         
     }
 
+    // /api/produtos
     //Atualizamos toda a entidade, mas se quiséssemos atualizar somente alguns atributos poderiamos usar o método [HttpPatch]
     [HttpPut("{id:int}")]
     public ActionResult Put(int id, Produto produto)
@@ -126,6 +134,7 @@ public class ProdutosController : ControllerBase
         
     }
 
+    // /api/produtos
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
