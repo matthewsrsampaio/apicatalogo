@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CategoriasController : ControllerBase
     {
@@ -60,11 +60,13 @@ namespace APICatalogo.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult<IEnumerable<Categoria>> Get(int id)
+        [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
+        public ActionResult<IEnumerable<Categoria>> Get(int id, string nome)
         {
             try
             {
+                var teste = nome; //existe só pra testar os parametros do roteamento
+
                 var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
 
                 if (categoria is null)

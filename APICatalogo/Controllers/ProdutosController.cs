@@ -16,15 +16,27 @@ public class ProdutosController : ControllerBase
         _context = context;
     }
 
+    //Apenas um teste do uso de IActionResult -> Note: Usado para MVC
+    [HttpGet("teste")]
+    public IActionResult GetTeste()
+    {
+        var produto = _context.Produtos.FirstOrDefault(p => p.Nome.Contains("Mat"));
+        
+        if (produto == null)
+            return NotFound();
+        
+        return Ok(produto);
+    }
+
     // api/produtos/primeiro
     [HttpGet("primeiro")]
     // /primeiro
     [HttpGet("/primeiro")]
-    public ActionResult<Produto> GetPrimeiro() //Esse método foi implementado só para exercitar o roteamento
+    public async Task<ActionResult<Produto>> GetPrimeiro() //Esse método foi implementado só para exercitar o roteamento
     {
         try
         {
-            var produto = _context.Produtos.FirstOrDefault();
+            var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync();
 
             if (produto is null)
                 return NotFound("Produto não encontrado");
@@ -40,17 +52,17 @@ public class ProdutosController : ControllerBase
 
     // /api/produtos
     [HttpGet]
-    public ActionResult<IEnumerable<Produto>> Get()
+    public async Task<ActionResult<IEnumerable<Produto>>> Get2() //Testando métodos assincronos
      //Para usar NotFound é necessário envelopar a classe no método ActionResult
     {
         try
         {
-            var produtos = _context.Produtos.ToList();
+            var produtos = await _context.Produtos.AsNoTracking().ToListAsync();
 
             if (produtos is null)
                 return NotFound("Produtos não encontrados!");
 
-            return Ok(produtos);
+            return produtos;
         }
         catch (Exception)
         {
@@ -62,13 +74,13 @@ public class ProdutosController : ControllerBase
     // /api/produtos/id                                                   // {nome=nomePadrao} significa que eu estou esperando um id/umaString, mas se a string não for passada ela receberá por padrão a string "nomePadrao"
     [HttpGet("{id:int:min(1)}/{nome=nomePadrao}", Name = "ObterProduto")] // "{id:int}") quer dizer que estou esperando um parâmetro do tipo inteiro chamado id
                                                                           // {id:int:min(1)} Estou criando uma restrição para que valores menores que 1 não sejam válidos. Pq? Pq dessa forma eu evito uma consulta desnecessária ao banco de dados.
-    public ActionResult<Produto> Get(int id, string nome)
+    public async Task<ActionResult<Produto>> Get(int id, string nome)
     {
         try
         {
             var nomeQualquer = nome;
 
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id); //FirstOrDefault vai atrás do primeiro id na tabela que se
+            var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id); //FirstOrDefault vai atrás do primeiro id na tabela que se
                                                                                     //assemelha ao id  que está sendo passado no parâmtro.
                                                                                     //Caso não encontre nada esse 'método me retornará um null.
             if (produto is null)
