@@ -1,6 +1,7 @@
 ﻿using ApiCatalogo.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 [Table("Produtos")]
@@ -9,23 +10,24 @@ public class Produto
     [Key]
     public int ProdutoId { get; set; }
 
-    [Required] //especifica que o valor do campo é NOTNULL
-    [StringLength(80)]
+    [Required(ErrorMessage = "O nome é obrigatório")] //especifica que o valor do campo é NOTNULL
+    [StringLength(20, MinimumLength = 3, ErrorMessage = "O nome deve ter entre {2} e {1} caracteres.")]
     public string? Nome { get; set; }
 
     [Required]//especifica que o valor do campo é NOTNULL
-    [StringLength(300)]
+    [StringLength(80, ErrorMessage = "A descrição deve ter no máximo entre {1} caracteres.")]
     public string? Descricao { get; set; }
-    
+
     [Required]//especifica que o valor do campo é NOTNULL
     [Column(TypeName = "decimal(10,2)")]
-    public decimal Preco {  get; set; }
+    [Range(1, 10000, ErrorMessage = "O preço deve estar entre {1} e {2}")]
+    public decimal Preco { get; set; }
 
     [Required]//especifica que o valor do campo é NOTNULL
     [StringLength(300)]
-    public string? ImagemUrl { get; set;}
+    public string? ImagemUrl { get; set; }
 
-    public float Estoque {  get; set; }
+    public float Estoque { get; set; }
 
     public DateTime DataCadastro {  get; set; }
 

@@ -101,8 +101,12 @@ public class ProdutosController : ControllerBase
     {
         try
         {
-            if (produto is null)
-                return BadRequest();
+            //Não estou precisando dessa validação aqui pq consigo fazer ela com o [ApiController] e com os Data Annotations
+            /*if (!ModelState.IsValid)
+                return BadRequest();*/
+
+            //Ajusta a data UTC automaticamente
+            produto.DataCadastro = DateTime.UtcNow;
 
             _context.Produtos.Add(produto); //Adicionando a instancia de produto
             _context.SaveChanges(); //Persiste as informações
@@ -130,6 +134,9 @@ public class ProdutosController : ControllerBase
             //já faz uma verificação pra saber se os ids batem. Se o id passado não existir no banco o sistema lança um BadRequest();
             if (id != produto.ProdutoId)
                 return BadRequest();
+
+            //Ajusta a data UTC automaticamente
+            produto.DataCadastro = DateTime.UtcNow;
 
             //Aqui precisamos informar que a entidade produto encontra-se em estado modificado.
             //Com isso o EntityFrameworkCore vai entender que essa entidade precisa ser persistida.
