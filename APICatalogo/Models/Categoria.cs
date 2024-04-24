@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -19,11 +20,12 @@ namespace ApiCatalogo.Models
         [Key]
         public int CategoriaId { get; set; }
 
-        [Required]
+        [Required] //especifica que o valor do campo é NOTNULL
         [StringLength(80)]
         public string? Nome { get; set; }  //A interrogação aqui significa que nosso atributo pode ser nulo
 
-        [Required]
+        [BindNever] //Ñão poderei usar como binding
+        [Required]//especifica que o valor do campo é NOTNULL
         [StringLength(300)]
         public string? ImagemUrl { get; set; }
         //Aqui estamos informando que uma categoria pode ter uma coleção de produto

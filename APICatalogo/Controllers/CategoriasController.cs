@@ -1,8 +1,10 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
+using APICatalogo.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers
@@ -17,6 +19,21 @@ namespace APICatalogo.Controllers
         {
             _context = context;
         }
+
+        //O [FromServices] é usado quando se quer linkar a injeção somente a um método. Normalmente a injeção é feita la no construtor para a classe inteira.
+        [HttpGet("saudacaoComFromService/{nome}")] 
+        public ActionResult<string> GetSaudacaoComFromServices([FromServices] IMeuServico meuServico, string nome)
+        {
+            return meuServico.saudacao(nome);
+        }
+
+        //Este é o comportamento padrão, sem o [FromServices]
+        [HttpGet("saudacaoSemFromService/{nome}")]
+        public ActionResult<string> GetSaudacaoSemFromServices(IMeuServico meuServico, string nome)
+        {
+            return meuServico.saudacao(nome);
+        }
+
 
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
@@ -41,9 +58,13 @@ namespace APICatalogo.Controllers
             }
         }
 
+        // api/categorias?numero=digitaQualquerNumero&nome=digitaQualquerString            o & concatena os atributos
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> Get()
+        public ActionResult<IEnumerable<Categoria>> GetCategoriasTeste([BindRequired] int numero, [BindRequired] string nome) //Com o [BindRequired] eu estou obrigando o requerente a me enviar os parametros numero e nome
         {
+            var _numero = numero;
+            var _nome = nome;
+
             try
             {
                 var categorias = _context.Categorias.AsNoTracking().ToList(); //Adicionei AsNoTracking() para a procura nao ser armazenada no cache(contexto). Pois é apenas uma consulta que não vai precisar do contexto(cache).

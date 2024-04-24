@@ -1,4 +1,5 @@
 using APICatalogo.Context;
+using APICatalogo.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -9,6 +10,11 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
         options.JsonSerializerOptions
             .ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+//Registrar o servico para add Atributo [FromServices]
+//O tempo de vida transient implica que sempre que o serviço for invocado ele ganhará uma nova instância
+builder.Services.AddTransient<IMeuServico, MeuServico>(); //Sempre que eu invocar a Interface ele vai me responder com a implementação dessa interface definida na classe concreta MeuServico
+
 
 // Add services to the container.
 builder.Services.AddControllers();
