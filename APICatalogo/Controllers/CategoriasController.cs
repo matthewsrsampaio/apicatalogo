@@ -40,8 +40,7 @@ namespace APICatalogo.Controllers
         {
             try
             {
-                var listaProdutos = _context.Categorias.Include(p => p.Produtos).AsNoTracking().ToList();  //Adicionei AsNoTracking() para a procura nao ser armazenada no cache(contexto). Pois é apenas uma consulta que não vai precisar do contexto(cache).
-
+                var listaProdutos = _context.Categorias.Include(p => p.Produtos).ToList();
                 //Dessa forma aqui consigo retornar uma lista de categorias onde o ID é menor ou igual a 5. Massa né?
                 //Aaahh o professor falou que nunca é bom retornar uma lista completa. É sempre bom colocar filtros.
                 //var listaProdutos = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();

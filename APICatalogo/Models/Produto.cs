@@ -1,4 +1,5 @@
 ﻿using ApiCatalogo.Models;
+using APICatalogo.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
@@ -12,6 +13,7 @@ public class Produto
 
     [Required(ErrorMessage = "O nome é obrigatório")] //especifica que o valor do campo é NOTNULL
     [StringLength(20, MinimumLength = 3, ErrorMessage = "O nome deve ter entre {2} e {1} caracteres.")]
+    [PrimeiraLetraMaiuscula] //Criamos essa anotação que verifica se a primeira letra do nome inserido é maiúscula
     public string? Nome { get; set; }
 
     [Required]//especifica que o valor do campo é NOTNULL
