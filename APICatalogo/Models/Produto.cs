@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 [Table("Produtos")]
-public class Produto
+public class Produto : IValidatableObject
 {
     [Key]
     public int ProdutoId { get; set; }
@@ -39,4 +39,32 @@ public class Produto
     //Aqui em Categoria eu estou informando que Produto está mapeado para uma Categoria
     [JsonIgnore] //vai ignorar a serialização dessa propriedade
     public Categoria? Categoria { get; set; }
+
+    //Essa é uma outra forma de validar os inputs/atributos
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        //Aqui eu veirifico se a letra inserida em nome é maiúscula
+        if (!string.IsNullOrEmpty(this.Nome))
+        {
+            var primeiraLetra = this.Nome[0].ToString();
+
+            if (primeiraLetra != primeiraLetra.ToUpper())
+            {
+                yield return new ValidationResult("A primeira letra do nome deve ser maiúscula.", //yield return indica que o método ou operador é um iterador
+                                                  new[] { nameof(this.Nome) } //nameof está sendo usado para obter o nome do tipo
+                                                  );
+            }
+
+            //Aqui eu veirifico se o estoque é maior que zero
+            if (this.Estoque < 1)
+            {
+                yield return new ValidationResult("O estoque deve ser maior que zero.",
+                                                  new[] { nameof(this.Estoque) }
+                                                  );
+            }
+
+        }
+
+    }
+
 }
