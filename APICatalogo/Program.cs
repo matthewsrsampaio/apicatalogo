@@ -30,6 +30,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Outra forma de se obter informações sobrbe as configurações
+var valor1 = builder.Configuration["chave1"];
+var valor2 = builder.Configuration["secao1:chave2"];
+
 //Definição da string de conexão
 string mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -41,16 +45,32 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment()) //Verifico se meu ambiente é o de desenvolvimento
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(); //Define o middleware do SWAGGER
+    app.UseSwaggerUI(); //Define o middlewware SWAGGER UserInterface
+    //app.UseDeveloperExceptionPage();
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); //Define o middleware para redirecionar as requisições HTTP para HTTPS
 
-app.UseAuthorization();
+//app.UseAuthentication(); //Define a autenticação do usuário
 
-app.MapControllers();
+app.UseAuthorization(); //Define o middleware para verificar as verificações de acesso
 
-app.Run();
+app.MapControllers(); //Define o mapeamento do controladores da aplicação
+
+/*app.Use(async (context, next) =>
+{
+    //adicionar o código antes do request
+    await next(context);
+    //adicionar o código depois do request
+});*/
+
+
+/*app.Run(async (context) =>
+{
+    await context.Response.WriteAsync("Middleware final");
+});*/
+
+app.Run(); //Inicio a aplicação e encerramento do pipeline dos middlewares.

@@ -14,10 +14,24 @@ namespace APICatalogo.Controllers
     public class CategoriasController : ControllerBase
     {
         private readonly AppDbContext _context;
-
-        public CategoriasController(AppDbContext context)
+        private readonly IConfiguration _configuration;
+        
+        public CategoriasController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+        }
+
+        [HttpGet("LerArquivoConfiguracao")]
+        public string GetValores()
+        {
+            var valor1 = _configuration["chave1"];
+            var valor2 = _configuration["chave2"];
+
+            var secao1 = _configuration["secao1:chave2"];
+            var connectionString = _configuration["ConnectionStrings:DefaultConnection"];
+
+            return $" Chave1 = {valor1} \n Chave2 = {valor2} \n Seção1 => Chave2 = {secao1}  \n Info Conexão =>> {connectionString}";
         }
 
         //O [FromServices] é usado quando se quer linkar a injeção somente a um método. Normalmente a injeção é feita la no construtor para a classe inteira.
