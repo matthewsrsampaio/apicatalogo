@@ -53,7 +53,7 @@ public class ProdutosController : ControllerBase
 
     // /api/produtos
     [HttpGet]
-    //Aplicando o filtro que eu criei
+    //Aplicando o filtro criado
     [ServiceFilter(typeof(ApiLoggingFilter))]
     public async Task<ActionResult<IEnumerable<Produto>>> Get2() //Testando métodos assincronos
      //Para usar NotFound é necessário envelopar a classe no método ActionResult

@@ -1,6 +1,7 @@
 using APICatalogo.Context;
 using APICatalogo.Extensions;
 using APICatalogo.Filters;
+using APICatalogo.Logging;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 //Registro do serviço do filtro
 builder.Services.AddScoped<ApiLoggingFilter>();
+
+//ADD Provedor do LOG personalizado ao sistema de log do ASP.NET Core definindo o nível mínimo de LOG
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+{
+    LogLevel = LogLevel.Information //Este foi o level escolhido
+}));
 
 var app = builder.Build();
 

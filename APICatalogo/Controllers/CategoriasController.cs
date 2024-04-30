@@ -1,8 +1,7 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
+using APICatalogo.Filters;
 using APICatalogo.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +14,16 @@ namespace APICatalogo.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly ILogger _logger;
         
-        public CategoriasController(AppDbContext context, IConfiguration configuration)
+        //**CONSTRUTOR**
+        public CategoriasController(AppDbContext context,
+                                    IConfiguration configuration, 
+                                    ILogger<CategoriasController> logger)
         {
             _context = context;
             _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpGet("LerArquivoConfiguracao")]
@@ -31,7 +35,7 @@ namespace APICatalogo.Controllers
             var secao1 = _configuration["secao1:chave2"];
             var connectionString = _configuration["ConnectionStrings:DefaultConnection"];
 
-            return $" Chave1 = {valor1} \n Chave2 = {valor2} \n Seção1 => Chave2 = {secao1}  \n Info Conexão =>> {connectionString}";
+            return $"Chave1 = {valor1}\nChave2 = {valor2}\nSeção1 => Chave2 = {secao1}\nInfo Conexão =>> {connectionString}";
         }
 
         //O [FromServices] é usado quando se quer linkar a injeção somente a um método. Normalmente a injeção é feita la no construtor para a classe inteira.
@@ -50,8 +54,12 @@ namespace APICatalogo.Controllers
 
 
         [HttpGet("produtos")]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
+
+            _logger.LogInformation("=================== Log-Information  GET api/categorias/produtos =====================");
+
             try
             {
                 var listaProdutos = _context.Categorias.Include(p => p.Produtos).ToList();
@@ -78,6 +86,8 @@ namespace APICatalogo.Controllers
             var _numero = numero;
             var _nome = nome;
 
+            _logger.LogInformation("=================== Log-Information  GET api/categorias/produtos =====================");
+
             try
             {
                 var categorias = _context.Categorias.AsNoTracking().ToList(); //Adicionei AsNoTracking() para a procura nao ser armazenada no cache(contexto). Pois é apenas uma consulta que não vai precisar do contexto(cache).
@@ -98,8 +108,11 @@ namespace APICatalogo.Controllers
         public ActionResult<IEnumerable<Categoria>> Get(int id, string nome)
         {
             //O código da linha abaixo foi somente para testar o tratamento de uma exceção através de um middleware
-            //hrow new Exception("Exceção ao retornar a categoria pelo id.");
-            
+            //throw new Exception("Exceção ao retornar a categoria pelo id.");
+
+            //LOG INFORMATION
+            _logger.LogInformation($"=================== Log-Information  GET api/categorias/id={id}&nome={nome} =====================");
+
             try
             {
                 var teste = nome; //existe só pra testar os parametros do roteamento
@@ -113,6 +126,7 @@ namespace APICatalogo.Controllers
             }
             catch (Exception)
             {
+                _logger.LogInformation($"=================== Log-Information  GET api/categorias/{id}&{nome} Status_Code -> {StatusCode(StatusCodes.Status500InternalServerError)} =====================");
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Oops, algo deu errado.");
             }
