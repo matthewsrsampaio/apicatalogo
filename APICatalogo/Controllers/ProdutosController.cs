@@ -1,4 +1,5 @@
 ﻿using APICatalogo.Context;
+using APICatalogo.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,8 @@ public class ProdutosController : ControllerBase
 
     // /api/produtos
     [HttpGet]
+    //Aplicando o filtro que eu criei
+    [ServiceFilter(typeof(ApiLoggingFilter))]
     public async Task<ActionResult<IEnumerable<Produto>>> Get2() //Testando métodos assincronos
      //Para usar NotFound é necessário envelopar a classe no método ActionResult
     {
