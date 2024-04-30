@@ -97,6 +97,9 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
         public ActionResult<IEnumerable<Categoria>> Get(int id, string nome)
         {
+            //O código da linha abaixo foi somente para testar o tratamento de uma exceção através de um middleware
+            //hrow new Exception("Exceção ao retornar a categoria pelo id.");
+            
             try
             {
                 var teste = nome; //existe só pra testar os parametros do roteamento

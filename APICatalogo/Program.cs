@@ -1,4 +1,5 @@
 using APICatalogo.Context;
+using APICatalogo.Extensions;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,7 @@ if (app.Environment.IsDevelopment()) //Verifico se meu ambiente é o de desenvol
 {
     app.UseSwagger(); //Define o middleware do SWAGGER
     app.UseSwaggerUI(); //Define o middlewware SWAGGER UserInterface
+    app.ConfigureExceptionHandler();
     //app.UseDeveloperExceptionPage();
 }
 
