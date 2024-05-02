@@ -2,6 +2,7 @@ using APICatalogo.Context;
 using APICatalogo.Extensions;
 using APICatalogo.Filters;
 using APICatalogo.Logging;
+using APICatalogo.Repositories;
 using APICatalogo.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -48,7 +49,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         ServerVersion.AutoDetect(mySqlConnection)));
 
 //Registro do serviço do filtro
-builder.Services.AddScoped<ApiLoggingFilter>();
+builder.Services.AddScoped<ApiLoggingFilter>(); // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
+
+//Registro do repositório de categoria
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();  // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
 
 //ADD Provedor do LOG personalizado ao sistema de log do ASP.NET Core definindo o nível mínimo de LOG
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
