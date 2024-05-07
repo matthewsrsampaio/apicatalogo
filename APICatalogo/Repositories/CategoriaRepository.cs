@@ -42,7 +42,7 @@ namespace APICatalogo.Repositories
             _context.SaveChanges();
 
             return categoria;
-        }
+        }       
 
         public Categoria Update(Categoria categoria)
         {
