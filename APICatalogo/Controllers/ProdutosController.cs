@@ -23,16 +23,19 @@ namespace APICatalogo.Controllers
         //api/produtos
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<IEnumerable<Produto>> GetProdutox()
+        public ActionResult<IQueryable<Produto>> GetProdutox()
         {
             _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
 
-            var produtos = await _repository.GetProdutos();
+            var produtos = _repository.GetProdutos();
 
-            return produtos;
+            if (produtos is null)
+                return NotFound();
+
+            return Ok(produtos);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name = "ObterProdutos")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Produto>> GetProduto(int id)
         {

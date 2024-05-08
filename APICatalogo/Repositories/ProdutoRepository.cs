@@ -13,9 +13,9 @@ namespace APICatalogo.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Produto>> GetProdutos()
+        public IQueryable<Produto> GetProdutos()
         {
-            var produtos = await _context.Produtos.AsNoTracking().ToListAsync();
+            var produtos = _context.Produtos;
             return produtos;
         }
 
@@ -37,28 +37,37 @@ namespace APICatalogo.Repositories
             return produto;
         }
 
-        public Produto Update(Produto produto)
+        public bool Update(Produto produto)
         {
             if (produto is null)
-                throw new ArgumentNullException(nameof(produto));
+                throw new InvalidOperationException("Produto é inválido.");
 
-            _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
+            if(_context.Produtos.Any(p => p.ProdutoId == produto.ProdutoId))
+            {
+                /*_context.Entry(produto).State = EntityState.Modified;*/ //Faz-se dessa forma quando a entidade não está sendo rastreada pelo contexto
+                _context.Produtos.Update(produto); //Pode fazer assim se a entidade estiver sendo rastreada pelo contexto
+                _context.SaveChanges();
+                return true;
+            }
 
-            return produto;
+            return false;
         }
 
-        public Produto Delete(int id)
+        public bool Delete(int id)
         {
             var produto = _context.Produtos.Find(id);
 
             if (produto is null)
                 throw new ArgumentNullException(nameof(produto));
 
-            _context.Produtos.Remove(produto);
-            _context.SaveChanges();
+            if (produto is not null)
+            {
+                _context.Produtos.Remove(produto);
+                _context.SaveChanges();
+                return true;
+            }
 
-            return produto;
+            return false;
         }
     }
 }

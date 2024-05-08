@@ -1,11 +1,12 @@
 ﻿using ApiCatalogo.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace APICatalogo.Repositories
 {
     public interface IProdutoRepository
     {
         //Get
-        Task<IEnumerable<Produto>> GetProdutos();
+        IQueryable<Produto> GetProdutos();
 
         //Get(id)
         Produto GetProduto(int id);
@@ -14,9 +15,9 @@ namespace APICatalogo.Repositories
         Produto Create(Produto produto);
 
         //Put
-        Produto Update(Produto produto);
+        bool Update(Produto produto);
 
         //Delete
-        Produto Delete(int id);
+        bool Delete(int id);
     }
 }
