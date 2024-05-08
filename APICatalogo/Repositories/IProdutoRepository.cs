@@ -1,9 +1,11 @@
-﻿namespace APICatalogo.Repositories
+﻿using ApiCatalogo.Models;
+
+namespace APICatalogo.Repositories
 {
     public interface IProdutoRepository
     {
         //Get
-        IEnumerable<Produto> GetProdutos();
+        Task<IEnumerable<Produto>> GetProdutos();
 
         //Get(id)
         Produto GetProduto(int id);

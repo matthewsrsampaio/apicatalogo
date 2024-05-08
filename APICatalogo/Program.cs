@@ -53,6 +53,7 @@ builder.Services.AddScoped<ApiLoggingFilter>(); // =>AddScoped é o tempo de vid
 
 //Registro do repositório de categoria
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();  // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 
 //ADD Provedor do LOG personalizado ao sistema de log do ASP.NET Core definindo o nível mínimo de LOG
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
