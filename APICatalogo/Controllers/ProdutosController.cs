@@ -77,7 +77,18 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _repository.Update(produto);
+            bool atualizado = _repository.Update(produto);
+
+            if (atualizado)
+            {
+                return Ok(produto);
+            } 
+            else
+            {
+                return StatusCode(500, $"Falha ao atualizar o produto de id = {id}");
+            }
+
+
 
             return Ok(produto);
         }
@@ -86,17 +97,17 @@ namespace APICatalogo.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult Delete(int id)
         {
-            var produto = _repository.GetProduto(id);
+            bool deletado = _repository.Delete(id);
 
-            if (produto is null)
+            if (deletado)
             {
                 _logger.LogWarning($"Produto {id} não foi encontrada.");
-                return NotFound($"Produto {id} não foi encontrada.");
+                return Ok($"Produto de id={id} foi excluído.");
             }
-
-            var produtoExcluido = _repository.Delete(id);
-
-            return Ok(produtoExcluido);
+            else
+            {
+                return StatusCode(500, $"Falha ao excluir objeto de id={id}");
+            }
         }
 
         /*//Apenas um teste do uso de IActionResult -> Note: Usado para MVC

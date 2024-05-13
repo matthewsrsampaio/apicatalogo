@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace APICatalogo.Repositories
 {
-    public interface IProdutoRepository
+    public interface IProdutoRepository : IRepository<Produto>
     {
-        //Get
+        IEnumerable<Produto> GetProdutosPorCategoria(int id);
+
+        /*//Get
         IQueryable<Produto> GetProdutos();
 
         //Get(id)
@@ -18,6 +20,6 @@ namespace APICatalogo.Repositories
         bool Update(Produto produto);
 
         //Delete
-        bool Delete(int id);
+        bool Delete(int id);*/
     }
 }

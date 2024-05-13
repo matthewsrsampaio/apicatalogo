@@ -1,19 +1,18 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace APICatalogo.Repositories
 {
-    public class CategoriaRepository : ICategoriaRepository
+    public class CategoriaRepository : Repository<Categoria>, ICategoriaRepository
     {
-        readonly AppDbContext _context;
-
-        public CategoriaRepository(AppDbContext context)
+        //Construtor está recebendo a instância do contexto lá de Repository.cs
+        public CategoriaRepository(AppDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public IEnumerable<Categoria> GetCategorias()
+        /*public IEnumerable<Categoria> GetCategorias()
         {
             var categorias = _context.Categorias.AsNoTracking().ToList();
             return categorias;
@@ -67,7 +66,6 @@ namespace APICatalogo.Repositories
             _context.SaveChanges();
 
             return categoria;
-        }
- 
+        }*/
     }
 }
