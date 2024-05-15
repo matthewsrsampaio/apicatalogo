@@ -14,36 +14,10 @@ namespace APICatalogo.Repositories
         {
         }
 
-        public Produto? Get(Expression<Func<Produto, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Produto> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<Produto> GetProdutosPorCategoria(int id)
         {
-            return GetAll().Where(c => c.ProdutoId == id);
+            return GetAll().Where(c => c.CategoriaId == id);
         }
-
-        public Produto Create(Produto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Produto Update(Produto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Produto Delete(Produto entity)
-        {
-            throw new NotImplementedException();
-        }
-    
 
         /*public IQueryable<Produto> GetProdutos()
         {

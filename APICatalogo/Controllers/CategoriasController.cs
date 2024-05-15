@@ -56,12 +56,12 @@ public class CategoriasController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Categoria>> GetCategoria()
     {
-        var categorias = _repository.GetCategorias().ToList();
+        var categorias = _repository.GetAll();
         return Ok(categorias);
     }
 
 
-    [HttpGet("produtos")]
+ /*   [HttpGet("produtos")]
     [ServiceFilter(typeof(ApiLoggingFilter))]
     public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
     {
@@ -75,13 +75,13 @@ public class CategoriasController : ControllerBase
         //Aaahh o professor falou que nunca é bom retornar uma lista completa. É sempre bom colocar filtros.
         //var listaProdutos = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
 
-        /*if (listaProdutos is null)
-            return BadRequest("Objeto não encontrado.");*/
+        *//*if (listaProdutos is null)
+            return BadRequest("Objeto não encontrado.");*//*
 
-        var listaProdutos = _repository.GetCategoriaProdutos();
+       // var listaProdutos = _repository.GetCategoriaProdutos();
 
         return Ok(listaProdutos);
-    }
+    }*/
 
     /*// api/categorias?numero=digitaQualquerNumero&nome=digitaQualquerString            o & concatena os atributos
     [HttpGet]
@@ -108,7 +108,7 @@ public class CategoriasController : ControllerBase
 
         var teste = nome; //existe só pra testar os parametros do roteamento
 
-        var categoria = _repository.GetCategoria(id);
+        var categoria = _repository.Get(c => c.CategoriaId == id);
 
         if (categoria is null)
         {
@@ -142,7 +142,7 @@ public class CategoriasController : ControllerBase
             _logger.LogWarning("PUT - Dados inválidos");
             return BadRequest("Categoria não encontrada.");
         }
-
+        
         _repository.Update(categoria);
 
         return Ok(categoria); 
@@ -151,7 +151,7 @@ public class CategoriasController : ControllerBase
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
-        var categoria = _repository.GetCategoria(id);
+        var categoria = _repository.Get(c => c.CategoriaId == id);
 
         if (categoria is null)
         {
@@ -159,7 +159,7 @@ public class CategoriasController : ControllerBase
             return NotFound($"Categoria {id} não foi encontrada.");
         }
 
-        var categoriaExcluida = _repository.Delete(id);
+        var categoriaExcluida = _repository.Delete(categoria);
 
         return Ok(categoriaExcluida);
     }

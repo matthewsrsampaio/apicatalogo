@@ -11,11 +11,13 @@ namespace APICatalogo.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _repository;
+        private readonly IProdutoRepository _produtoRepository;
+        private readonly IRepository<Produto> _repository;
         private readonly ILogger _logger;
 
-        public ProdutosController(IProdutoRepository repository, ILogger<ProdutosController> logger, AppDbContext context)
+        public ProdutosController(IProdutoRepository produtoRepository, IRepository<Produto> repository, ILogger<ProdutosController> logger)
         {
+            _produtoRepository = produtoRepository;
             _repository = repository;
             _logger = logger;
         }
@@ -23,14 +25,28 @@ namespace APICatalogo.Controllers
         //api/produtos
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<IQueryable<Produto>> GetProdutox()
+        public ActionResult<IQueryable<Produto>> GetProdutos()
         {
             _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
 
-            var produtos = _repository.GetProdutos();
+            var produtos = _repository.GetAll();
 
             if (produtos is null)
                 return NotFound();
+
+            return Ok(produtos);
+        }
+
+        //api/produtosPorCategoria/id
+        [HttpGet("produtosPorCategoria/{id}")]
+        public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int id)
+        {
+            var produtos = _produtoRepository.GetProdutosPorCategoria(id);
+
+            if(produtos is null)
+                return NotFound();
+
+            _logger.LogInformation($"==============     PUT     ==============");
 
             return Ok(produtos);
         }
@@ -39,7 +55,7 @@ namespace APICatalogo.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Produto>> GetProduto(int id)
         {
-            var produto = _repository.GetProduto(id);
+            var produto = _repository.Get(p => p.ProdutoId == id);
 
             if (produto is null)
                 NotFound($"Produto de id = {id} não foi encontrado.");
@@ -71,35 +87,42 @@ namespace APICatalogo.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult Put(int id, Produto produto)
         {
-            if (produto.ProdutoId != id)
+            if (id != produto.ProdutoId)
             {
-                _logger.LogWarning("PUT - Dados inválidos.");
+               _logger.LogWarning("PUT - Dados inválidos.");
                 return BadRequest();
             }
 
-            bool atualizado = _repository.Update(produto);
+            var produtoAtualizado = _repository.Update(produto);
+            _logger.LogInformation($"==============     PUT     ==============");
+            _logger.LogInformation($"Produto de id={id} foi atualizado.");
+            return Ok(produtoAtualizado);
 
-            if (atualizado)
+            /*if (atualizado)
             {
                 return Ok(produto);
             } 
             else
             {
                 return StatusCode(500, $"Falha ao atualizar o produto de id = {id}");
-            }
-
-
-
-            return Ok(produto);
+            }*/
         }
 
         [HttpDelete("{id:int}")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult Delete(int id)
         {
-            bool deletado = _repository.Delete(id);
+            var produto = _repository.Get(d => d.ProdutoId == id);
 
-            if (deletado)
+            if (produto is null)
+                return NotFound("Produto não encontrado");
+
+            var produtoDeletado = _produtoRepository.Delete(produto);
+            _logger.LogInformation($"==============     DELETE     ==============");
+            _logger.LogWarning($"Produto de id={id} foi deletado.");
+            return Ok(produtoDeletado);
+
+            /*if (produto is null)
             {
                 _logger.LogWarning($"Produto {id} não foi encontrada.");
                 return Ok($"Produto de id={id} foi excluído.");
@@ -107,7 +130,7 @@ namespace APICatalogo.Controllers
             else
             {
                 return StatusCode(500, $"Falha ao excluir objeto de id={id}");
-            }
+            }*/
         }
 
         /*//Apenas um teste do uso de IActionResult -> Note: Usado para MVC
