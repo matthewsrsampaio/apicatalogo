@@ -1,5 +1,6 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -16,7 +17,8 @@ namespace APICatalogo.Repositories
 
         public IEnumerable<Produto> GetProdutosPorCategoria(int id)
         {
-            return GetAll().Where(c => c.CategoriaId == id);
+            var produtoCategoria = GetAll().Where(c => c.CategoriaId == id);
+            return produtoCategoria;
         }
 
         /*public IQueryable<Produto> GetProdutos()

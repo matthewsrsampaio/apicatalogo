@@ -11,14 +11,14 @@ namespace APICatalogo.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _produtoRepository;
-        private readonly IRepository<Produto> _repository;
+        //private readonly IProdutoRepository _produtoRepository;
+        //private readonly IRepository<Produto> _repository;
+        private readonly IUnitOfWork _uof;
         private readonly ILogger _logger;
 
-        public ProdutosController(IProdutoRepository produtoRepository, IRepository<Produto> repository, ILogger<ProdutosController> logger)
+        public ProdutosController(IUnitOfWork uof, ILogger<ProdutosController> logger)
         {
-            _produtoRepository = produtoRepository;
-            _repository = repository;
+            _uof = uof;
             _logger = logger;
         }
 
@@ -29,7 +29,7 @@ namespace APICatalogo.Controllers
         {
             _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
 
-            var produtos = _repository.GetAll();
+            var produtos = _uof.ProdutoRepository.GetAll();
 
             if (produtos is null)
                 return NotFound();
@@ -39,12 +39,14 @@ namespace APICatalogo.Controllers
 
         //api/produtosPorCategoria/id
         [HttpGet("produtosPorCategoria/{id}")]
-        public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int id)
+        public ActionResult<IEnumerable<Produto>> GetProdutosCategoria(int id)
         {
-            var produtos = _produtoRepository.GetProdutosPorCategoria(id);
+            var produtos = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
 
-            if(produtos is null)
+            if (produtos is null)
+            {
                 return NotFound();
+            }
 
             _logger.LogInformation($"==============     PUT     ==============");
 
@@ -55,7 +57,7 @@ namespace APICatalogo.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Produto>> GetProduto(int id)
         {
-            var produto = _repository.Get(p => p.ProdutoId == id);
+            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
             if (produto is null)
                 NotFound($"Produto de id = {id} não foi encontrado.");
@@ -75,7 +77,9 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            var produtoCriado = _repository.Create(produto);
+            produto.DataCadastro = DateTime.UtcNow;
+            var produtoCriado = _uof.ProdutoRepository.Create(produto);
+            _uof.Commit();//Aqui eu estou persistindo as informações
 
             _logger.LogInformation($"=================== Log - Information  POST api/produtos ===================== ");
             _logger.LogInformation($"=================== POST id = {produtoCriado.ProdutoId}, produto = {produtoCriado.Nome} ===================== ");
@@ -93,33 +97,30 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            var produtoAtualizado = _repository.Update(produto);
+            var produtoAtualizado = _uof.ProdutoRepository.Update(produto);
+            _uof.Commit();//Aqui eu estou persistindo as informações
+
             _logger.LogInformation($"==============     PUT     ==============");
             _logger.LogInformation($"Produto de id={id} foi atualizado.");
-            return Ok(produtoAtualizado);
 
-            /*if (atualizado)
-            {
-                return Ok(produto);
-            } 
-            else
-            {
-                return StatusCode(500, $"Falha ao atualizar o produto de id = {id}");
-            }*/
+            return Ok(produtoAtualizado);
         }
 
         [HttpDelete("{id:int}")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult Delete(int id)
         {
-            var produto = _repository.Get(d => d.ProdutoId == id);
+            var produto = _uof.ProdutoRepository.Get(d => d.ProdutoId == id);
 
             if (produto is null)
                 return NotFound("Produto não encontrado");
 
-            var produtoDeletado = _produtoRepository.Delete(produto);
+            var produtoDeletado = _uof.ProdutoRepository.Delete(produto);
+            _uof.Commit();//Aqui eu estou persistindo as informações
+
             _logger.LogInformation($"==============     DELETE     ==============");
             _logger.LogWarning($"Produto de id={id} foi deletado.");
+
             return Ok(produtoDeletado);
 
             /*if (produto is null)

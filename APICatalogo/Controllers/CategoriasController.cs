@@ -13,16 +13,15 @@ namespace APICatalogo.Controllers;
 [ApiController]
 public class CategoriasController : ControllerBase
 {
-    private readonly ICategoriaRepository _repository;
+    //private readonly ICategoriaRepository _repository;
+    private readonly IUnitOfWork _uof;
     private readonly IConfiguration _configuration;
     private readonly ILogger _logger;
     
     //**CONSTRUTOR**
-    public CategoriasController(ICategoriaRepository repository,
-                                IConfiguration configuration,
-                                ILogger<CategoriasController> logger)
+    public CategoriasController(IUnitOfWork uof, IConfiguration configuration, ILogger<CategoriasController> logger)
     {
-        _repository = repository;
+        _uof = uof;
         _configuration = configuration;
         _logger = logger;
     }
@@ -56,32 +55,99 @@ public class CategoriasController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Categoria>> GetCategoria()
     {
-        var categorias = _repository.GetAll();
+        var categorias = _uof.CategoriaRepository.GetAll();
         return Ok(categorias);
     }
 
-
- /*   [HttpGet("produtos")]
-    [ServiceFilter(typeof(ApiLoggingFilter))]
-    public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+    [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
+    public ActionResult<IEnumerable<Categoria>> Get(int id, string nome)
     {
+        //O código da linha abaixo foi somente para testar o tratamento de uma exceção através de um middleware
+        //throw new Exception("Exceção ao retornar a categoria pelo id.");
 
-        //throw new ArgumentException("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  TESTE TESTE TESTE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        var teste = nome; //existe só pra testar os parametros do roteamento
 
-        _logger.LogInformation("=================== Log-Information  GET api/categorias/produtos =====================");
+        var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
 
-        //var listaProdutos = _context.Categorias.Include(p => p.Produtos).ToList();
-        //Dessa forma aqui consigo retornar uma lista de categorias onde o ID é menor ou igual a 5. Massa né?
-        //Aaahh o professor falou que nunca é bom retornar uma lista completa. É sempre bom colocar filtros.
-        //var listaProdutos = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
+        if (categoria is null)
+        {
+            //LOG INFORMATION
+            _logger.LogInformation($"=================== Log-Information  GET api/categorias/id={id}&nome={nome} =====================");
+            return NotFound($"Essa categoria não foi encontrada. ID = {id}");
+        }
 
-        *//*if (listaProdutos is null)
-            return BadRequest("Objeto não encontrado.");*//*
+        return Ok(categoria);
+    }
 
-       // var listaProdutos = _repository.GetCategoriaProdutos();
+    [HttpPost]
+    public ActionResult Post(Categoria categoria)
+    {
+        if (categoria is null)
+        {
+            _logger.LogWarning("POST - Dados inválidos");
+            return BadRequest();
+        }
 
-        return Ok(listaProdutos);
-    }*/
+        var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
+        _uof.Commit();//Aqui eu estou persistindo as informações
+
+        return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaCriada.CategoriaId }, categoriaCriada);
+    }
+
+    [HttpPut("{id:int}")]
+    public ActionResult Put(int id, Categoria categoria)
+    {
+        if (id != categoria.CategoriaId)
+        {
+            _logger.LogWarning("PUT - Dados inválidos");
+            return BadRequest("Categoria não encontrada.");
+        }
+
+        _uof.CategoriaRepository.Update(categoria);
+        _uof.Commit();//Aqui eu estou persistindo as informações
+
+        return Ok(categoria);
+    }
+
+    [HttpDelete("{id:int}")]
+    public ActionResult Delete(int id)
+    {
+        var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
+
+        if (categoria is null)
+        {
+            _logger.LogWarning($"Categoria {id} não foi encontrada.");
+            return NotFound($"Categoria {id} não foi encontrada.");
+        }
+
+        var categoriaExcluida = _uof.CategoriaRepository.Delete(categoria);
+        _uof.Commit();//Aqui eu estou persistindo as informações
+
+        return Ok(categoriaExcluida);
+    }
+
+
+    /*   [HttpGet("produtos")]
+       [ServiceFilter(typeof(ApiLoggingFilter))]
+       public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+       {
+
+           //throw new ArgumentException("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  TESTE TESTE TESTE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+           _logger.LogInformation("=================== Log-Information  GET api/categorias/produtos =====================");
+
+           //var listaProdutos = _context.Categorias.Include(p => p.Produtos).ToList();
+           //Dessa forma aqui consigo retornar uma lista de categorias onde o ID é menor ou igual a 5. Massa né?
+           //Aaahh o professor falou que nunca é bom retornar uma lista completa. É sempre bom colocar filtros.
+           //var listaProdutos = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
+
+           *//*if (listaProdutos is null)
+               return BadRequest("Objeto não encontrado.");*//*
+
+          // var listaProdutos = _repository.GetCategoriaProdutos();
+
+           return Ok(listaProdutos);
+       }*/
 
     /*// api/categorias?numero=digitaQualquerNumero&nome=digitaQualquerString            o & concatena os atributos
     [HttpGet]
@@ -99,69 +165,5 @@ public class CategoriasController : ControllerBase
 
         return categorias;
     }*/
-
-    [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
-    public ActionResult<IEnumerable<Categoria>> Get(int id, string nome)
-    {
-        //O código da linha abaixo foi somente para testar o tratamento de uma exceção através de um middleware
-        //throw new Exception("Exceção ao retornar a categoria pelo id.");
-
-        var teste = nome; //existe só pra testar os parametros do roteamento
-
-        var categoria = _repository.Get(c => c.CategoriaId == id);
-
-        if (categoria is null)
-        {
-            //LOG INFORMATION
-            _logger.LogInformation($"=================== Log-Information  GET api/categorias/id={id}&nome={nome} =====================");
-            return NotFound($"Essa categoria não foi encontrada. ID = {id}");
-        }
-            
-        return Ok(categoria);
-    }
-
-    [HttpPost]
-    public ActionResult Post(Categoria categoria)
-    {
-        if (categoria is null) 
-        { 
-            _logger.LogWarning("POST - Dados inválidos");
-            return BadRequest();
-        }
-
-        var categoriaCriada = _repository.Create(categoria);
-
-        return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaCriada.CategoriaId }, categoriaCriada);
-    }
-
-    [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Categoria categoria)
-    {
-        if (id != categoria.CategoriaId)
-        {
-            _logger.LogWarning("PUT - Dados inválidos");
-            return BadRequest("Categoria não encontrada.");
-        }
-        
-        _repository.Update(categoria);
-
-        return Ok(categoria); 
-    }
-
-    [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
-    {
-        var categoria = _repository.Get(c => c.CategoriaId == id);
-
-        if (categoria is null)
-        {
-            _logger.LogWarning($"Categoria {id} não foi encontrada.");
-            return NotFound($"Categoria {id} não foi encontrada.");
-        }
-
-        var categoriaExcluida = _repository.Delete(categoria);
-
-        return Ok(categoriaExcluida);
-    }
 
 }

@@ -29,7 +29,7 @@ namespace ApiCatalogo.Models
         public string? ImagemUrl { get; set; }
         //Aqui estamos informando que uma categoria pode ter uma coleção de produto
 
-        //[JsonIgnore]     -> Se eu deixar o decoration [JsonIgnore] o GET api/Categorias/produtos não vai funcionar corretamente. Eu coloquei essa decoração pra evitar problemas de CICLOS, mas não precisa mais.
+        //[JsonIgnore]    // -> Se eu deixar o decoration [JsonIgnore] o GET api/Categorias/produtos não vai funcionar corretamente. Eu coloquei essa decoração pra evitar problemas de CICLOS, mas não precisa mais.
         //Para realizar buscas em cadeia e exibir JSON em cadeia eu posso criar uma lista de uma outra classe modelo.
         public ICollection<Produto>? Produtos { get; set; }
 
