@@ -1,5 +1,6 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
+using APICatalogo.DTOs;
 using APICatalogo.Filters;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
@@ -53,14 +54,32 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Categoria>> GetCategoria()
+    public ActionResult<IEnumerable<CategoriaDTO>> GetCategorias()
     {
         var categorias = _uof.CategoriaRepository.GetAll();
-        return Ok(categorias);
+
+        if (categorias is null)
+            return NotFound("Não existem categorias.");
+
+        var categoriaListDto = new List<CategoriaDTO>();
+
+        foreach(var cat in categorias)
+        {
+            var categoriaDto = new CategoriaDTO
+            {
+                CategoriaId = cat.CategoriaId,
+                Nome = cat.Nome,
+                ImagemUrl = cat.ImagemUrl
+
+            };
+            categoriaListDto.Add(categoriaDto);
+        }
+
+        return Ok(categoriaListDto);
     }
 
     [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
-    public ActionResult<IEnumerable<Categoria>> Get(int id, string nome)
+    public ActionResult<IEnumerable<CategoriaDTO>> Get(int id, string nome)
     {
         //O código da linha abaixo foi somente para testar o tratamento de uma exceção através de um middleware
         //throw new Exception("Exceção ao retornar a categoria pelo id.");
@@ -76,41 +95,80 @@ public class CategoriasController : ControllerBase
             return NotFound($"Essa categoria não foi encontrada. ID = {id}");
         }
 
+        var categoriaDto = new CategoriaDTO()
+        {
+            CategoriaId = categoria.CategoriaId,
+            Nome = categoria.Nome,
+            ImagemUrl = categoria.ImagemUrl
+        };
+
         return Ok(categoria);
     }
 
     [HttpPost]
-    public ActionResult Post(Categoria categoria)
+    public ActionResult<CategoriaDTO> Post(CategoriaDTO categoriaDto)
     {
-        if (categoria is null)
+        if (categoriaDto is null)
         {
             _logger.LogWarning("POST - Dados inválidos");
             return BadRequest();
         }
 
+        //Converte CategoriaDTO para Categoria - Agora eu posso salvar no banco - REQUEST
+        var categoria = new Categoria()
+        {
+            CategoriaId = categoriaDto.CategoriaId,
+            Nome = categoriaDto.Nome,
+            ImagemUrl = categoriaDto.ImagemUrl
+        };
+
         var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
         _uof.Commit();//Aqui eu estou persistindo as informações
 
-        return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaCriada.CategoriaId }, categoriaCriada);
+        //Converte Categoria para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
+        var novaCategoriaDto = new CategoriaDTO()
+        {
+            CategoriaId = categoriaCriada.CategoriaId,
+            Nome = categoriaCriada.Nome,
+            ImagemUrl = categoriaCriada.ImagemUrl
+        };
+
+        return new CreatedAtRouteResult("ObterCategoria", new { id = novaCategoriaDto.CategoriaId }, novaCategoriaDto);
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Categoria categoria)
+    public ActionResult<CategoriaDTO> Put(int id, CategoriaDTO categoriaDto)
     {
-        if (id != categoria.CategoriaId)
+        if (id != categoriaDto.CategoriaId)
         {
             _logger.LogWarning("PUT - Dados inválidos");
             return BadRequest("Categoria não encontrada.");
         }
 
-        _uof.CategoriaRepository.Update(categoria);
+        //Converte CategoriaDTO para Categoria - Agora eu posso salvar no banco - REQUEST
+        var categoria = new Categoria()
+        {
+            CategoriaId = categoriaDto.CategoriaId,
+            Nome = categoriaDto.Nome,
+            ImagemUrl = categoriaDto.ImagemUrl
+        };
+
+        var categoriaAtualizada = _uof.CategoriaRepository.Update(categoria);
         _uof.Commit();//Aqui eu estou persistindo as informações
 
-        return Ok(categoria);
+        //Converte Categoria(Já atualizada) para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
+        var categoriaAtualizadaDto = new CategoriaDTO()
+        {
+            CategoriaId = categoriaAtualizada.CategoriaId,
+            Nome = categoriaAtualizada.Nome,
+            ImagemUrl = categoriaAtualizada.ImagemUrl
+        };
+
+        return Ok(categoriaAtualizadaDto);
     }
 
     [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    public ActionResult<CategoriaDTO> Delete(int id)
     {
         var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
 
@@ -123,7 +181,15 @@ public class CategoriasController : ControllerBase
         var categoriaExcluida = _uof.CategoriaRepository.Delete(categoria);
         _uof.Commit();//Aqui eu estou persistindo as informações
 
-        return Ok(categoriaExcluida);
+        //Converte Categoria(Já excluída) para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
+        var categoriaExcluidaDto = new CategoriaDTO()
+        {
+            CategoriaId = categoriaExcluida.CategoriaId,
+            Nome = categoriaExcluida.Nome,
+            ImagemUrl = categoriaExcluida.ImagemUrl
+        };
+
+        return Ok(categoriaExcluidaDto);
     }
 
 
