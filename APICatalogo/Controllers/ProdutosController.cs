@@ -1,7 +1,10 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
+using APICatalogo.DTOs;
 using APICatalogo.Filters;
 using APICatalogo.Repositories;
+using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,18 +17,20 @@ namespace APICatalogo.Controllers
         //private readonly IProdutoRepository _produtoRepository;
         //private readonly IRepository<Produto> _repository;
         private readonly IUnitOfWork _uof;
+        private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public ProdutosController(IUnitOfWork uof, ILogger<ProdutosController> logger)
+        public ProdutosController(IUnitOfWork uof, ILogger<ProdutosController> logger, IMapper mapper)
         {
             _uof = uof;
             _logger = logger;
+            _mapper = mapper;
         }
 
         //api/produtos
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<IQueryable<Produto>> GetProdutos()
+        public ActionResult<IQueryable<ProdutoDTO>> GetProdutos()
         {
             _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
 
@@ -34,28 +39,34 @@ namespace APICatalogo.Controllers
             if (produtos is null)
                 return NotFound();
 
-            return Ok(produtos);
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produtoDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+
+            return Ok(produtoDto);
         }
 
         //api/produtosPorCategoria/id
         [HttpGet("produtosPorCategoria/{id}")]
-        public ActionResult<IEnumerable<Produto>> GetProdutosCategoria(int id)
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosCategoria(int id)
         {
-            var produtos = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
+            var produto = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
 
-            if (produtos is null)
+            if (produto is null)
             {
                 return NotFound();
             }
 
             _logger.LogInformation($"==============     PUT     ==============");
 
-            return Ok(produtos);
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produtoDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produto);
+
+            return Ok(produtoDto);
         }
 
         [HttpGet("{id:int}", Name = "ObterProdutos")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<IEnumerable<Produto>> GetProduto(int id)
+        public ActionResult<ProdutoDTO> GetProduto(int id)
         {
             var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
@@ -64,33 +75,44 @@ namespace APICatalogo.Controllers
 
             _logger.LogInformation($"=================== Log - Information  GET api/produtos/{id} ===================== ");
 
-            return Ok(produto);
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produtoDto = _mapper.Map<ProdutoDTO>(produto);  
+
+            return Ok(produtoDto);
         }
 
         [HttpPost]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult Post(Produto produto)
+        public ActionResult<ProdutoDTO> Post(ProdutoDTO produtoDto)
         {
-            if (produto is null)
+            if (produtoDto is null)
             {
                 _logger.LogWarning("POST - Dados inválidos.");
                 return BadRequest();
             }
 
-            produto.DataCadastro = DateTime.UtcNow;
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produto = _mapper.Map<Produto>(produtoDto);
+
             var produtoCriado = _uof.ProdutoRepository.Create(produto);
             _uof.Commit();//Aqui eu estou persistindo as informações
 
-            _logger.LogInformation($"=================== Log - Information  POST api/produtos ===================== ");
-            _logger.LogInformation($"=================== POST id = {produtoCriado.ProdutoId}, produto = {produtoCriado.Nome} ===================== ");
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produtoCriadoDto = _mapper.Map<ProdutoDTO>(produtoCriado);
 
-            return Ok(new CreatedAtRouteResult("ObterProdutos", new { id = produtoCriado.ProdutoId }, produtoCriado));
+            _logger.LogInformation($"=================== Log - Information  POST api/produtos ===================== ");
+            _logger.LogInformation($"=================== POST id = {produtoCriadoDto.ProdutoId}, produto = {produtoCriadoDto.Nome} ===================== ");
+
+            return Ok(new CreatedAtRouteResult("ObterProdutos", new { id = produtoCriadoDto.ProdutoId }, produtoCriadoDto));
         }
 
         [HttpPut("{id:int}")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult Put(int id, Produto produto)
+        public ActionResult<ProdutoDTO> Put(int id, ProdutoDTO produtoDto)
         {
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produto = _mapper.Map<Produto>(produtoDto);
+
             if (id != produto.ProdutoId)
             {
                _logger.LogWarning("PUT - Dados inválidos.");
@@ -100,28 +122,74 @@ namespace APICatalogo.Controllers
             var produtoAtualizado = _uof.ProdutoRepository.Update(produto);
             _uof.Commit();//Aqui eu estou persistindo as informações
 
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produtoAtualizadoDto = _mapper.Map<ProdutoDTO>(produtoAtualizado);
+
             _logger.LogInformation($"==============     PUT     ==============");
             _logger.LogInformation($"Produto de id={id} foi atualizado.");
 
-            return Ok(produtoAtualizado);
+            return Ok(produtoAtualizadoDto);
+        }
+
+        //Este método realiza atualizações parciais.
+        [HttpPatch("{id}/UpdatePartial")]
+        public ActionResult<ProdutoDTOUpdateResponse> Patch(int id,
+            JsonPatchDocument<ProdutoDTOUpdateRequest> patchProdutoDTO)
+        {
+            //Verifica se o id recebido pela requisição é válido e o se o corpo é nulo
+            if (id <= 0 || patchProdutoDTO is null)
+                return BadRequest("Id inválido ou produto nulo.");
+
+            //Crio uma variável para receber o produto com o id da requisição
+            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
+
+            //Verifico se o produto recebido é nulo
+            if (produto is null)
+                return NotFound("produto não existe");
+
+            //Converto o Produto em ProdutoDTOUpdateRequest(Este DTO pode realizar as atualizações PATCH)
+            var produtoUpdateRequest = _mapper.Map<ProdutoDTOUpdateRequest>(produto);
+
+            //Aplico o patchProdutoDTO no produtoUpdateRequest e coloco em modo de transição ModelState
+            patchProdutoDTO.ApplyTo(produtoUpdateRequest,ModelState);
+
+            //Verifico se o ModelState é válido
+            if(!ModelState.IsValid || TryValidateModel(produtoUpdateRequest))
+                return BadRequest(ModelState);
+
+            //Mapeia produtoUpdateRequest(DTO) para produto(Produto)
+            _mapper.Map(produtoUpdateRequest, produto);
+
+           //Persiste no no banco.
+            _uof.ProdutoRepository.Update(produto);
+            _uof.Commit();
+
+            //Transforma o Produto em ProdutoDTOUpdateResponse
+                                             //SOURCE - DESTINATION
+            var produtoUpdated = _mapper.Map<ProdutoDTOUpdateResponse>(produto);
+
+            return Ok(produtoUpdated);
         }
 
         [HttpDelete("{id:int}")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult Delete(int id)
-        {
+        public ActionResult<ProdutoDTO> Delete(int id)
+        {   
             var produto = _uof.ProdutoRepository.Get(d => d.ProdutoId == id);
 
             if (produto is null)
                 return NotFound("Produto não encontrado");
 
-            var produtoDeletado = _uof.ProdutoRepository.Delete(produto);
+            var produtoExcluido = _uof.ProdutoRepository.Delete(produto);
             _uof.Commit();//Aqui eu estou persistindo as informações
+
+            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+            var produtoExcluidoDto = _mapper.Map<ProdutoDTO>(produtoExcluido);
 
             _logger.LogInformation($"==============     DELETE     ==============");
             _logger.LogWarning($"Produto de id={id} foi deletado.");
 
-            return Ok(produtoDeletado);
+            return Ok(produtoExcluidoDto);
 
             /*if (produto is null)
             {

@@ -1,4 +1,5 @@
 using APICatalogo.Context;
+using APICatalogo.DTOs.Mappings;
 using APICatalogo.Extensions;
 using APICatalogo.Filters;
 using APICatalogo.Logging;
@@ -14,9 +15,8 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add(typeof(ApiExceptionFilter));
 })
-    .AddJsonOptions(options =>
-        options.JsonSerializerOptions
-            .ReferenceHandler = ReferenceHandler.IgnoreCycles);
+    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+    .AddNewtonsoftJson(); // -> AddNewtonsoftJson(); adiciona o tratamento JSON PATCH 
 
 //Registrar o servico para add Atributo [FromServices]
 //O tempo de vida transient implica que sempre que o serviço for invocado ele ganhará uma nova instância
@@ -63,6 +63,10 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
 {
     LogLevel = LogLevel.Information //Este foi o level escolhido
 }));
+
+//Adiciona o serviço de AutoMapper
+//Desinstalei o pacote de injeção de dependência do AutoMapper pq, aparentemente, ele ja está incluso na sua versão 13. Que é a qual estou usando. A partir daí, o erro de ambiguidade sumiu.
+builder.Services.AddAutoMapper(typeof(ProdutoDTOMappingProfile));
 
 var app = builder.Build();
 

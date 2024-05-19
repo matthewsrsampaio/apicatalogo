@@ -1,6 +1,7 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
 using APICatalogo.DTOs;
+using APICatalogo.DTOs.Mappings;
 using APICatalogo.Filters;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
@@ -56,24 +57,12 @@ public class CategoriasController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<CategoriaDTO>> GetCategorias()
     {
-        var categorias = _uof.CategoriaRepository.GetAll();
+        var categoriasList = _uof.CategoriaRepository.GetAll();
 
-        if (categorias is null)
+        if (categoriasList is null)
             return NotFound("Não existem categorias.");
-
-        var categoriaListDto = new List<CategoriaDTO>();
-
-        foreach(var cat in categorias)
-        {
-            var categoriaDto = new CategoriaDTO
-            {
-                CategoriaId = cat.CategoriaId,
-                Nome = cat.Nome,
-                ImagemUrl = cat.ImagemUrl
-
-            };
-            categoriaListDto.Add(categoriaDto);
-        }
+        
+        var categoriaListDto = categoriasList.ToCategoriaDTOList();
 
         return Ok(categoriaListDto);
     }
@@ -95,14 +84,10 @@ public class CategoriasController : ControllerBase
             return NotFound($"Essa categoria não foi encontrada. ID = {id}");
         }
 
-        var categoriaDto = new CategoriaDTO()
-        {
-            CategoriaId = categoria.CategoriaId,
-            Nome = categoria.Nome,
-            ImagemUrl = categoria.ImagemUrl
-        };
+        //Converte CategoriaDTO para Categoria - Agora eu posso salvar no banco - RESPONSE
+        var categoriaDTO = categoria.ToCategoriaDTO();
 
-        return Ok(categoria);
+        return Ok(categoriaDTO);
     }
 
     [HttpPost]
@@ -115,25 +100,17 @@ public class CategoriasController : ControllerBase
         }
 
         //Converte CategoriaDTO para Categoria - Agora eu posso salvar no banco - REQUEST
-        var categoria = new Categoria()
-        {
-            CategoriaId = categoriaDto.CategoriaId,
-            Nome = categoriaDto.Nome,
-            ImagemUrl = categoriaDto.ImagemUrl
-        };
+        var categoria = categoriaDto.ToCategoria();
 
         var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
         _uof.Commit();//Aqui eu estou persistindo as informações
 
         //Converte Categoria para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
-        var novaCategoriaDto = new CategoriaDTO()
-        {
-            CategoriaId = categoriaCriada.CategoriaId,
-            Nome = categoriaCriada.Nome,
-            ImagemUrl = categoriaCriada.ImagemUrl
-        };
+        var novaCategoriaDto = categoria.ToCategoriaDTO();
 
-        return new CreatedAtRouteResult("ObterCategoria", new { id = novaCategoriaDto.CategoriaId }, novaCategoriaDto);
+        return new CreatedAtRouteResult("ObterCategoria", 
+               new { id = novaCategoriaDto.CategoriaId },
+               novaCategoriaDto);
     }
 
     [HttpPut("{id:int}")]
@@ -146,23 +123,13 @@ public class CategoriasController : ControllerBase
         }
 
         //Converte CategoriaDTO para Categoria - Agora eu posso salvar no banco - REQUEST
-        var categoria = new Categoria()
-        {
-            CategoriaId = categoriaDto.CategoriaId,
-            Nome = categoriaDto.Nome,
-            ImagemUrl = categoriaDto.ImagemUrl
-        };
+        var categoria = categoriaDto.ToCategoria();
 
         var categoriaAtualizada = _uof.CategoriaRepository.Update(categoria);
         _uof.Commit();//Aqui eu estou persistindo as informações
 
         //Converte Categoria(Já atualizada) para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
-        var categoriaAtualizadaDto = new CategoriaDTO()
-        {
-            CategoriaId = categoriaAtualizada.CategoriaId,
-            Nome = categoriaAtualizada.Nome,
-            ImagemUrl = categoriaAtualizada.ImagemUrl
-        };
+        var categoriaAtualizadaDto = categoria.ToCategoriaDTO();
 
         return Ok(categoriaAtualizadaDto);
     }
@@ -182,12 +149,7 @@ public class CategoriasController : ControllerBase
         _uof.Commit();//Aqui eu estou persistindo as informações
 
         //Converte Categoria(Já excluída) para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
-        var categoriaExcluidaDto = new CategoriaDTO()
-        {
-            CategoriaId = categoriaExcluida.CategoriaId,
-            Nome = categoriaExcluida.Nome,
-            ImagemUrl = categoriaExcluida.ImagemUrl
-        };
+        var categoriaExcluidaDto = categoria.ToCategoriaDTO();
 
         return Ok(categoriaExcluidaDto);
     }

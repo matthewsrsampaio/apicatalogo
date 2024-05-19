@@ -103,3 +103,8 @@ D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\APICatalogo.pdb
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\APICatalogo.genruntimeconfig.cache
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\ref\APICatalogo.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\APICatalogo.sourcelink.json
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\AutoMapper.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Newtonsoft.Json.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
