@@ -1,5 +1,6 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
+using APICatalogo.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -13,6 +14,14 @@ namespace APICatalogo.Repositories
         //Construtor está recebendo a instância do contexto lá de Repository.cs
         public ProdutoRepository(AppDbContext context) : base(context)
         {
+        }
+
+        public IEnumerable<Produto> GetProdutos(ProdutosParameters produtosParams)
+        {
+            return GetAll()
+                .OrderBy(x => x.Nome)
+                .Skip((produtosParams.pageNumber - 1) * produtosParams.pageSize) // Vai saltar os produtos que pertencem as páginas anteriores
+                .Take(produtosParams.pageSize).ToList(); // Vai obter a quantidade de produtos a serem retornados
         }
 
         public IEnumerable<Produto> GetProdutosPorCategoria(int id)
