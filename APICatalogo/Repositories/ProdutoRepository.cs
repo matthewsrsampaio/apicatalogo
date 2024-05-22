@@ -16,12 +16,19 @@ namespace APICatalogo.Repositories
         {
         }
 
-        public IEnumerable<Produto> GetProdutos(ProdutosParameters produtosParams)
+        /*public IEnumerable<Produto> GetProdutos(ProdutosParameters produtosParams)
         {
             return GetAll()
                 .OrderBy(x => x.Nome)
                 .Skip((produtosParams.pageNumber - 1) * produtosParams.pageSize) // Vai saltar os produtos que pertencem as páginas anteriores
                 .Take(produtosParams.pageSize).ToList(); // Vai obter a quantidade de produtos a serem retornados
+        }*/
+
+        public PagedList<Produto> GetProdutos(ProdutosParameters produtosParameters)
+        {
+            var produtos = GetAll().OrderBy(p => p.ProdutoId).AsQueryable(); // AsQueryable vai tranformar o resultado de IEnumerable para IQueryable
+            var produtosOrdenados = PagedList<Produto>.ToPagedList(produtos, produtosParameters.pageNumber, produtosParameters.pageSize);
+            return produtosOrdenados;
         }
 
         public IEnumerable<Produto> GetProdutosPorCategoria(int id)
