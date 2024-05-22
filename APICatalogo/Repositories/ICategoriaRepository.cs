@@ -1,9 +1,12 @@
 ﻿using ApiCatalogo.Models;
+using APICatalogo.Pagination;
 
 namespace APICatalogo.Repositories;
 
 public interface ICategoriaRepository : IRepository<Categoria>
 {
+    PagedList<Categoria> GetCategorias(CategoriasParameters categoriasParameters);
+
     /*//Get
     IEnumerable<Categoria> GetCategorias();
 

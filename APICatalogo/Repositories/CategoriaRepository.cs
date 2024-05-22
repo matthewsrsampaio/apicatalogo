@@ -1,5 +1,6 @@
 ﻿using ApiCatalogo.Models;
 using APICatalogo.Context;
+using APICatalogo.Pagination;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -10,6 +11,15 @@ namespace APICatalogo.Repositories
         //Construtor está recebendo a instância do contexto lá de Repository.cs
         public CategoriaRepository(AppDbContext context) : base(context)
         {
+        }
+
+        public PagedList<Categoria> GetCategorias(CategoriasParameters categoriasParameters)
+        {
+            //Obtenho uma lista de categorias ordenadas pelo id, transformo-as em Queryable e armazeno na variável categorias.
+            var categorias = GetAll().OrderBy(categorias => categorias.CategoriaId).AsQueryable();
+            //Chamo o método estático ToPagedList(objeto, pageNumber, pageSize) e armazeno as listas em categoriasOrdenadas.
+            var categoriasOrdenadas = PagedList<Categoria>.ToPagedList(categorias, categoriasParameters.pageNumber, categoriasParameters.pageSize);
+            return categoriasOrdenadas;
         }
 
         /*public IEnumerable<Categoria> GetCategorias()
