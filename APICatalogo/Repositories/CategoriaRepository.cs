@@ -3,6 +3,7 @@ using APICatalogo.Context;
 using APICatalogo.Pagination;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace APICatalogo.Repositories
 {
@@ -21,6 +22,23 @@ namespace APICatalogo.Repositories
             var categoriasOrdenadas = PagedList<Categoria>.ToPagedList(categorias, categoriasParameters.pageNumber, categoriasParameters.pageSize);
             return categoriasOrdenadas;
         }
+
+        public PagedList<Categoria> GetCategoriasFiltroNome(CategoriasFiltroNome categoriasParams)
+        {
+            var categorias = GetAll().AsQueryable();
+
+            if (!string.IsNullOrEmpty(categoriasParams.Nome))
+            {
+                categorias = categorias.Where(c => c.Nome.Contains(categoriasParams.Nome));
+            }
+
+            var categoriasFiltradas = PagedList<Categoria>.ToPagedList(categorias, categoriasParams.pageNumber, categoriasParams.pageSize);
+
+            return categoriasFiltradas;
+        }
+
+
+
 
         /*public IEnumerable<Categoria> GetCategorias()
         {

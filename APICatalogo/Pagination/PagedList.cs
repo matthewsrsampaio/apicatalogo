@@ -14,6 +14,8 @@
             TotalCount = count;
             PageSize = pageSize;
             CurrentPage = pageNumber;
+            // Math.Ceiling arredonda o número francionado para cima, sou seja, para o próximo número inteiro.
+            //Se o resultado aqui for 10.3 Math.Ceiling vai arredondar pra 11.
             TotalPages = (int)Math.Ceiling(count / (double)PageSize);
 
             AddRange(items);
@@ -22,7 +24,7 @@
         public static PagedList<T> ToPagedList(IQueryable<T> source, int pageNumber, int pageSize)
         {
             var count = source.Count();
-            var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();//Vai pular determinado numero de objetos na lista
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
 

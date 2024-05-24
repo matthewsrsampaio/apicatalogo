@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace APICatalogo.Repositories
 {
-    public class ProdutoRepository : Repository<Produto>,  IProdutoRepository
+    public class ProdutoRepository : Repository<Produto>, IProdutoRepository
     {
         readonly AppDbContext _context;
 
@@ -16,19 +16,42 @@ namespace APICatalogo.Repositories
         {
         }
 
-        /*public IEnumerable<Produto> GetProdutos(ProdutosParameters produtosParams)
-        {
-            return GetAll()
-                .OrderBy(x => x.Nome)
-                .Skip((produtosParams.pageNumber - 1) * produtosParams.pageSize) // Vai saltar os produtos que pertencem as páginas anteriores
-                .Take(produtosParams.pageSize).ToList(); // Vai obter a quantidade de produtos a serem retornados
-        }*/
-
         public PagedList<Produto> GetProdutos(ProdutosParameters produtosParameters)
         {
             var produtos = GetAll().OrderBy(p => p.ProdutoId).AsQueryable(); // AsQueryable vai tranformar o resultado de IEnumerable para IQueryable
             var produtosOrdenados = PagedList<Produto>.ToPagedList(produtos, produtosParameters.pageNumber, produtosParameters.pageSize);
             return produtosOrdenados;
+        }
+
+        //Obter um produto filtrado
+        public PagedList<Produto> GetProdutosFiltroPreco(ProdutosFiltroPreco produtosFiltroParams)
+        {
+            // Aqui iremos obter uma lista de todos os produtos e transforma-los em IQueryable;
+            var produtos = GetAll().AsQueryable();
+
+            //Se o objeto passado tiver valor e não for vazio ou nulo nós iremos aplicar nossos filtros
+            if (produtosFiltroParams.Preco.HasValue && !string.IsNullOrEmpty(produtosFiltroParams.PrecoCriterio))
+            {
+                //Ordenaremos pelo produtos de maior preço
+                if (produtosFiltroParams.PrecoCriterio.Equals("maior", StringComparison.OrdinalIgnoreCase))
+                {
+                    produtos = produtos.Where(p => p.Preco > produtosFiltroParams.Preco.Value).OrderBy(p => p.Preco);
+                }
+                //Ordenaremos pelo produtos de menor preço
+                else if (produtosFiltroParams.PrecoCriterio.Equals("menor", StringComparison.OrdinalIgnoreCase))
+                {
+                    produtos = produtos.Where(p => p.Preco < produtosFiltroParams.Preco.Value).OrderBy(p => p.Preco);
+                }
+                //Ordenaremos pelo produtos do mesmo preço
+                else if (produtosFiltroParams.PrecoCriterio.Equals("igual", StringComparison.OrdinalIgnoreCase))
+                {
+                    produtos = produtos.Where(p => p.Preco == produtosFiltroParams.Preco.Value).OrderBy(p => p.Preco);
+                }
+            }
+            //Com o objeto desejado em "mãos" aplicaremos nossa paginação a ele
+            var produtosFiltrados = PagedList<Produto>.ToPagedList(produtos, produtosFiltroParams.pageNumber, produtosFiltroParams.pageSize);
+            //Retornamos nosso objeto filtrado e paginado
+            return produtosFiltrados;
         }
 
         public IEnumerable<Produto> GetProdutosPorCategoria(int id)
@@ -37,61 +60,5 @@ namespace APICatalogo.Repositories
             return produtoCategoria;
         }
 
-        /*public IQueryable<Produto> GetProdutos()
-        {
-            var produtos = _context.Produtos;
-            return produtos;
-        }
-
-        public Produto GetProduto(int id)
-        {
-            var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
-            return produto;
-        }
-
-        public Produto Create(Produto produto)
-        {
-            if (produto is null)
-                throw new ArgumentException(nameof(produto));
-            
-            produto.DataCadastro = DateTime.UtcNow;
-            _context.Produtos.Add(produto);
-            _context.SaveChanges();
-
-            return produto;
-        }
-
-        public bool Update(Produto produto)
-        {
-            if (produto is null)
-                throw new InvalidOperationException("Produto é inválido.");
-
-            if(_context.Produtos.Any(p => p.ProdutoId == produto.ProdutoId))
-            {
-                *//*_context.Entry(produto).State = EntityState.Modified;*//* //Faz-se dessa forma quando a entidade não está sendo rastreada pelo contexto
-                _context.Produtos.Update(produto); //Pode fazer assim se a entidade estiver sendo rastreada pelo contexto
-                _context.SaveChanges();
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool Delete(int id)
-        {
-            var produto = _context.Produtos.Find(id);
-
-            if (produto is null)
-                throw new ArgumentNullException(nameof(produto));
-
-            if (produto is not null)
-            {
-                _context.Produtos.Remove(produto);
-                _context.SaveChanges();
-                return true;
-            }
-
-            return false;
-        }*/
     }
 }
