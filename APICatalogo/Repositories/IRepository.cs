@@ -6,9 +6,9 @@ namespace APICatalogo.Repositories
     //Cuidade para não violar o princípio ISP - Não forçar o cliente a depender de interfaces que não utilizam
     public interface IRepository<T>
     {
-        IEnumerable<T> GetAll();
+        Task<IEnumerable<T>> GetAllAsync();
         
-        T? Get(Expression<Func<T,bool>> predicate); //Esse get vai receber uma função Lambda como parâmetro
+        Task<T?> GetAsync(Expression<Func<T,bool>> predicate); //Esse get vai receber uma função Lambda como parâmetro
 
         T Create(T entity);
 
