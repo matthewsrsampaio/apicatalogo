@@ -108,3 +108,5 @@ D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.AspNetC
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Newtonsoft.Json.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\X.PagedList.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\X.PagedList.Mvc.Core.dll

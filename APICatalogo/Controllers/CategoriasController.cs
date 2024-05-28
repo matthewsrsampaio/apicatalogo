@@ -6,6 +6,7 @@ using APICatalogo.Repositories;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using X.PagedList;
 
 namespace APICatalogo.Controllers;
 
@@ -19,23 +20,25 @@ public class CategoriasController : ControllerBase
     private readonly ILogger _logger;
     
     //**CONSTRUTOR**
-    public CategoriasController(IUnitOfWork uof, IConfiguration configuration, ILogger<CategoriasController> logger)
+    public CategoriasController(IUnitOfWork uof, 
+           IConfiguration configuration, 
+           ILogger<CategoriasController> logger)
     {
         _uof = uof;
         _configuration = configuration;
         _logger = logger;
     }
 
-    private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(PagedList<Categoria> categorias)
+    private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(IPagedList<Categoria> categorias)
     {
         var metadata = new
         {
-            categorias.TotalCount,
+            categorias.Count, //TotalCount,
             categorias.PageSize,
-            categorias.CurrentPage,
-            categorias.TotalPages,
-            categorias.HasNext,
-            categorias.HasPrevious
+            categorias.PageCount, //CurrentPage,
+            categorias.TotalItemCount, //TotalPages,
+            categorias.HasNextPage,  //HasNext
+            categorias.HasPreviousPage   //HasPreviousPage
         };
 
         //Vai exibir na cabeçalho da Response informações pertinentes a paginação
@@ -47,16 +50,16 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpGet("Pagination")]
-    public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasParameters categoriasParameters)
+    public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get([FromQuery] CategoriasParameters categoriasParameters)
     {
-        var categorias = _uof.CategoriaRepository.GetCategorias(categoriasParameters);
+        var categorias = await _uof.CategoriaRepository.GetCategoriasAsync(categoriasParameters);
         return ObterCategorias(categorias);
     }
 
     [HttpGet("filter/nome/pagination")]
-    public ActionResult<IEnumerable<CategoriaDTO>> GetCategoriasFiltradas([FromQuery] CategoriasFiltroNome categoriasFiltro)
+    public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategoriasFiltradas([FromQuery] CategoriasFiltroNome categoriasFiltro)
     {
-        var categoriasFiltradas = _uof.CategoriaRepository.GetCategoriasFiltroNome(categoriasFiltro);
+        var categoriasFiltradas = await _uof.CategoriaRepository.GetCategoriasFiltroNomeAsync(categoriasFiltro);
         return ObterCategorias(categoriasFiltradas);
     }
 
@@ -87,9 +90,9 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<CategoriaDTO>> GetCategorias()
+    public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategorias()
     {
-        var categoriasList = _uof.CategoriaRepository.GetAll();
+        var categoriasList = await _uof.CategoriaRepository.GetAllAsync();
 
         if (categoriasList is null)
             return NotFound("Não existem categorias.");
@@ -100,14 +103,14 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
-    public ActionResult<IEnumerable<CategoriaDTO>> Get(int id, string nome)
+    public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get(int id, string nome)
     {
         //O código da linha abaixo foi somente para testar o tratamento de uma exceção através de um middleware
         //throw new Exception("Exceção ao retornar a categoria pelo id.");
 
         var teste = nome; //existe só pra testar os parametros do roteamento
 
-        var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
+        var categoria = await _uof.CategoriaRepository.GetAsync(c => c.CategoriaId == id);
 
         if (categoria is null)
         {
@@ -123,7 +126,7 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<CategoriaDTO> Post(CategoriaDTO categoriaDto)
+    public async Task<ActionResult<CategoriaDTO>> Post(CategoriaDTO categoriaDto)
     {
         if (categoriaDto is null)
         {
@@ -135,7 +138,7 @@ public class CategoriasController : ControllerBase
         var categoria = categoriaDto.ToCategoria();
 
         var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
-        _uof.Commit();//Aqui eu estou persistindo as informações
+        await _uof.CommitAsync();//Aqui eu estou persistindo as informações
 
         //Converte Categoria para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
         var novaCategoriaDto = categoria.ToCategoriaDTO();
@@ -146,7 +149,7 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult<CategoriaDTO> Put(int id, CategoriaDTO categoriaDto)
+    public async Task<ActionResult<CategoriaDTO>> Put(int id, CategoriaDTO categoriaDto)
     {
         if (id != categoriaDto.CategoriaId)
         {
@@ -158,7 +161,7 @@ public class CategoriasController : ControllerBase
         var categoria = categoriaDto.ToCategoria();
 
         var categoriaAtualizada = _uof.CategoriaRepository.Update(categoria);
-        _uof.Commit();//Aqui eu estou persistindo as informações
+        await _uof.CommitAsync();//Aqui eu estou persistindo as informações
 
         //Converte Categoria(Já atualizada) para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
         var categoriaAtualizadaDto = categoria.ToCategoriaDTO();
@@ -167,9 +170,9 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    public ActionResult<CategoriaDTO> Delete(int id)
+    public async Task<ActionResult<CategoriaDTO>> Delete(int id)
     {
-        var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
+        var categoria = await _uof.CategoriaRepository.GetAsync(c => c.CategoriaId == id);
 
         if (categoria is null)
         {
@@ -178,7 +181,7 @@ public class CategoriasController : ControllerBase
         }
 
         var categoriaExcluida = _uof.CategoriaRepository.Delete(categoria);
-        _uof.Commit();//Aqui eu estou persistindo as informações
+        await _uof.CommitAsync();//Aqui eu estou persistindo as informações
 
         //Converte Categoria(Já excluída) para CategoriaDTO - Agora eu posso passar meu response filtrado - RESPONSE
         var categoriaExcluidaDto = categoria.ToCategoriaDTO();

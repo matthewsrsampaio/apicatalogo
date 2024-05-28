@@ -4,6 +4,7 @@ using APICatalogo.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using X.PagedList;
 
 namespace APICatalogo.Repositories
 {
@@ -16,7 +17,7 @@ namespace APICatalogo.Repositories
         {
         }
 
-        public async Task<PagedList<Produto>> GetProdutosAsync(ProdutosParameters produtosParameters)
+        public async Task<IPagedList<Produto>> GetProdutosAsync(ProdutosParameters produtosParams)
         {
             //obtendo meus produtos de forma assincrona
             var produtos = await GetAllAsync();
@@ -24,13 +25,18 @@ namespace APICatalogo.Repositories
             //OrderBy só funciona de forma Sincrona. Por isso nós criamos essa segunda variável
             var produtosOrdenados = produtos.OrderBy(p => p.ProdutoId).AsQueryable(); // AsQueryable vai tranformar o resultado de IEnumerable para IQueryable
 
-            var resultado = PagedList<Produto>
-                .ToPagedList(produtosOrdenados, produtosParameters.pageNumber, produtosParameters.pageSize);
+            var resultado = await produtosOrdenados.ToPagedListAsync(produtosParams.pageNumber,
+                                                                     produtosParams.pageSize);
+                
+                /*var resultado = IPagedList<Produto>
+                .ToPagedList(produtosOrdenados,
+                             produtosParameters.pageNumber, 
+                             produtosParameters.pageSize);*/
             return resultado;
         }
 
         //Obter um produto filtrado
-        public async Task<PagedList<Produto>> GetProdutosFiltroPrecoAsync(ProdutosFiltroPreco produtosFiltroParams)
+        public async Task<IPagedList<Produto>> GetProdutosFiltroPrecoAsync(ProdutosFiltroPreco produtosFiltroParams)
         {
             // Aqui iremos obter uma lista de todos os produtos e transforma-los em IQueryable;
             var produtos = await GetAllAsync();
@@ -58,11 +64,14 @@ namespace APICatalogo.Repositories
                 }
             }
             //Com o objeto desejado em "mãos" aplicaremos nossa paginação a ele
-            var produtosFiltrados = PagedList<Produto>.ToPagedList(produtos.AsQueryable(), 
+            /*var produtosFiltrados = IPagedList<Produto>.ToPagedList(produtos.AsQueryable(), 
                                                                    produtosFiltroParams.pageNumber, 
-                                                                   produtosFiltroParams.pageSize);
+                                                                   produtosFiltroParams.pageSize);*/
+            var produtosOrdenados = await produtos.ToPagedListAsync(produtosFiltroParams.pageNumber,
+                                                              produtosFiltroParams.pageSize);
+
             //Retornamos nosso objeto filtrado e paginado
-            return produtosFiltrados;
+            return produtosOrdenados;
         }
 
         public async Task<IEnumerable<Produto>> GetProdutosPorCategoriaAsync(int id)

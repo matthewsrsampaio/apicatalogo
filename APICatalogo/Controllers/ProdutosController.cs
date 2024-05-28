@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using X.PagedList;
 
 namespace APICatalogo.Controllers
 {
@@ -28,29 +29,29 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("pagination")]
-        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParameters)
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get([FromQuery] ProdutosParameters produtosParameters)
         {
-            var produtos = _uof.ProdutoRepository.GetProdutos(produtosParameters);
+            var produtos = await _uof.ProdutoRepository.GetProdutosAsync(produtosParameters);
             return ObterProdutos(produtos);
         }
 
         [HttpGet("filter/preco/pagination")]
-        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosFilterPreco([FromQuery] ProdutosFiltroPreco produtosFiltroPrecoParameters)
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosFilterPreco([FromQuery] ProdutosFiltroPreco produtosFiltroPrecoParameters)
         {
-            var produtos = _uof.ProdutoRepository.GetProdutosFiltroPreco(produtosFiltroPrecoParameters);
+            var produtos = await _uof.ProdutoRepository.GetProdutosFiltroPrecoAsync(produtosFiltroPrecoParameters);
             return ObterProdutos(produtos);
         }
 
-        private ActionResult<IEnumerable<ProdutoDTO>> ObterProdutos(PagedList<Produto> produtos)
+        private ActionResult<IEnumerable<ProdutoDTO>> ObterProdutos(IPagedList<Produto> produtos)
         {
             var metadata = new
             {
-                produtos.TotalCount,
+                produtos.Count, //TotalCount,
                 produtos.PageSize,
-                produtos.CurrentPage,
-                produtos.TotalPages,
-                produtos.HasNext,
-                produtos.HasPrevious
+                produtos.PageCount,    //CurrentPage,
+                produtos.TotalItemCount,     //TotalPages,
+                produtos.HasNextPage,   //HasNext
+                produtos.HasPreviousPage   //HasPrevious
             };
 
             Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
@@ -62,11 +63,11 @@ namespace APICatalogo.Controllers
         //api/produtos
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<IQueryable<ProdutoDTO>> GetProdutos()
+        public async Task<ActionResult<IQueryable<ProdutoDTO>>> GetProdutos()
         {
             _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
 
-            var produtos = _uof.ProdutoRepository.GetAll();
+            var produtos = _uof.ProdutoRepository.GetAllAsync();
 
             if (produtos is null)
                 return NotFound();
@@ -79,9 +80,9 @@ namespace APICatalogo.Controllers
 
         //api/produtosPorCategoria/id
         [HttpGet("produtosPorCategoria/{id}")]
-        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosCategoria(int id)
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosCategoria(int id)
         {
-            var produto = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
+            var produto = await _uof.ProdutoRepository.GetProdutosPorCategoriaAsync(id);
 
             if (produto is null)
             {
@@ -98,9 +99,9 @@ namespace APICatalogo.Controllers
 
         [HttpGet("{id:int}", Name = "ObterProdutos")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<ProdutoDTO> GetProduto(int id)
+        public async Task<ActionResult<ProdutoDTO>> GetProduto(int id)
         {
-            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
+            var produto = await _uof.ProdutoRepository.GetAsync(p => p.ProdutoId == id);
 
             if (produto is null)
                 NotFound($"Produto de id = {id} não foi encontrado.");
@@ -115,7 +116,7 @@ namespace APICatalogo.Controllers
 
         [HttpPost]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<ProdutoDTO> Post(ProdutoDTO produtoDto)
+        public async Task<ActionResult<ProdutoDTO>> Post(ProdutoDTO produtoDto)
         {
             if (produtoDto is null)
             {
@@ -127,7 +128,7 @@ namespace APICatalogo.Controllers
             var produto = _mapper.Map<Produto>(produtoDto);
 
             var produtoCriado = _uof.ProdutoRepository.Create(produto);
-            _uof.Commit();//Aqui eu estou persistindo as informações
+            await _uof.CommitAsync();//Aqui eu estou persistindo as informações
 
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoCriadoDto = _mapper.Map<ProdutoDTO>(produtoCriado);
@@ -140,7 +141,7 @@ namespace APICatalogo.Controllers
 
         [HttpPut("{id:int}")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<ProdutoDTO> Put(int id, ProdutoDTO produtoDto)
+        public async Task<ActionResult<ProdutoDTO>> Put(int id, ProdutoDTO produtoDto)
         {
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produto = _mapper.Map<Produto>(produtoDto);
@@ -152,7 +153,7 @@ namespace APICatalogo.Controllers
             }
 
             var produtoAtualizado = _uof.ProdutoRepository.Update(produto);
-            _uof.Commit();//Aqui eu estou persistindo as informações
+            await _uof.CommitAsync();//Aqui eu estou persistindo as informações
 
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoAtualizadoDto = _mapper.Map<ProdutoDTO>(produtoAtualizado);
@@ -165,7 +166,7 @@ namespace APICatalogo.Controllers
 
         //Este método realiza atualizações parciais.
         [HttpPatch("{id}/UpdatePartial")]
-        public ActionResult<ProdutoDTOUpdateResponse> Patch(int id,
+        public async Task<ActionResult<ProdutoDTOUpdateResponse>> Patch(int id,
             JsonPatchDocument<ProdutoDTOUpdateRequest> patchProdutoDTO)
         {
             //Verifica se o id recebido pela requisição é válido e o se o corpo é nulo
@@ -173,7 +174,7 @@ namespace APICatalogo.Controllers
                 return BadRequest("Id inválido ou produto nulo.");
 
             //Crio uma variável para receber o produto com o id da requisição
-            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
+            var produto = await _uof.ProdutoRepository.GetAsync(p => p.ProdutoId == id);
 
             //Verifico se o produto recebido é nulo
             if (produto is null)
@@ -194,7 +195,7 @@ namespace APICatalogo.Controllers
 
            //Persiste no no banco.
             _uof.ProdutoRepository.Update(produto);
-            _uof.Commit();
+            await _uof.CommitAsync();
 
             //Transforma o Produto em ProdutoDTOUpdateResponse
                                              //SOURCE - DESTINATION
@@ -205,15 +206,15 @@ namespace APICatalogo.Controllers
 
         [HttpDelete("{id:int}")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<ProdutoDTO> Delete(int id)
+        public async Task<ActionResult<ProdutoDTO>> Delete(int id)
         {   
-            var produto = _uof.ProdutoRepository.Get(d => d.ProdutoId == id);
+            var produto = await _uof.ProdutoRepository.GetAsync(d => d.ProdutoId == id);
 
             if (produto is null)
                 return NotFound("Produto não encontrado");
 
             var produtoExcluido = _uof.ProdutoRepository.Delete(produto);
-            _uof.Commit();//Aqui eu estou persistindo as informações
+            await _uof.CommitAsync();//Aqui eu estou persistindo as informações
 
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoExcluidoDto = _mapper.Map<ProdutoDTO>(produtoExcluido);
