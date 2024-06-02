@@ -110,3 +110,11 @@ D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Newtonsoft.Json.d
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\X.PagedList.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\X.PagedList.Mvc.Core.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

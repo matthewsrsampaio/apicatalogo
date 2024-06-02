@@ -4,6 +4,7 @@ using APICatalogo.DTOs.Mappings;
 using APICatalogo.Pagination;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using X.PagedList;
@@ -27,26 +28,6 @@ public class CategoriasController : ControllerBase
         _uof = uof;
         _configuration = configuration;
         _logger = logger;
-    }
-
-    private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(IPagedList<Categoria> categorias)
-    {
-        var metadata = new
-        {
-            categorias.Count, //TotalCount,
-            categorias.PageSize,
-            categorias.PageCount, //CurrentPage,
-            categorias.TotalItemCount, //TotalPages,
-            categorias.HasNextPage,  //HasNext
-            categorias.HasPreviousPage   //HasPreviousPage
-        };
-
-        //Vai exibir na cabeçalho da Response informações pertinentes a paginação
-        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-
-        var categoriasDto = categorias.ToCategoriaDTOList();
-
-        return Ok(categoriasDto);
     }
 
     [HttpGet("Pagination")]
@@ -90,6 +71,7 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategorias()
     {
         var categoriasList = await _uof.CategoriaRepository.GetAllAsync();
@@ -187,6 +169,26 @@ public class CategoriasController : ControllerBase
         var categoriaExcluidaDto = categoria.ToCategoriaDTO();
 
         return Ok(categoriaExcluidaDto);
+    }
+
+    private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(IPagedList<Categoria> categorias)
+    {
+        var metadata = new
+        {
+            categorias.Count, //TotalCount,
+            categorias.PageSize,
+            categorias.PageCount, //CurrentPage,
+            categorias.TotalItemCount, //TotalPages,
+            categorias.HasNextPage,  //HasNext
+            categorias.HasPreviousPage   //HasPreviousPage
+        };
+
+        //Vai exibir na cabeçalho da Response informações pertinentes a paginação
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+        var categoriasDto = categorias.ToCategoriaDTOList();
+
+        return Ok(categoriasDto);
     }
 
 

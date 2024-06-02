@@ -48,6 +48,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(mySqlConnection,
         ServerVersion.AutoDetect(mySqlConnection)));
 
+//Registro do serviço de aautorização
+builder.Services.AddAuthorization();
+
+//Registro de registro de autenticação JWT
+builder.Services.AddAuthentication("Bearer").AddJwtBearer();
+
 //Registro do serviço do filtro
 builder.Services.AddScoped<ApiLoggingFilter>(); // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
 
@@ -83,6 +89,7 @@ app.UseHttpsRedirection(); //Define o middleware para redirecionar as requisiç�
 
 //app.UseAuthentication(); //Define a autenticação do usuário
 
+//Não estou precisando desse cara abaixo pq ja tenho um autorizador la em cima, mas vou deixar ele ai.
 app.UseAuthorization(); //Define o middleware para verificar as verificações de acesso
 
 app.MapControllers(); //Define o mapeamento do controladores da aplicação
