@@ -5,6 +5,7 @@ using APICatalogo.Filters;
 using APICatalogo.Logging;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -53,6 +54,11 @@ builder.Services.AddAuthorization();
 
 //Registro de registro de autenticação JWT
 builder.Services.AddAuthentication("Bearer").AddJwtBearer();
+
+//Registro de configuração do Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>() //Atenção para inserir aqui a class AppDbContext
+    .AddDefaultTokenProviders();
 
 //Registro do serviço do filtro
 builder.Services.AddScoped<ApiLoggingFilter>(); // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.

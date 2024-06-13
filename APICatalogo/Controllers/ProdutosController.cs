@@ -42,32 +42,14 @@ namespace APICatalogo.Controllers
             return ObterProdutos(produtos);
         }
 
-        private ActionResult<IEnumerable<ProdutoDTO>> ObterProdutos(IPagedList<Produto> produtos)
-        {
-            var metadata = new
-            {
-                produtos.Count, //TotalCount,
-                produtos.PageSize,
-                produtos.PageCount,    //CurrentPage,
-                produtos.TotalItemCount,     //TotalPages,
-                produtos.HasNextPage,   //HasNext
-                produtos.HasPreviousPage   //HasPrevious
-            };
-
-            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-
-            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
-            return Ok(produtosDto);
-        }
-
         //api/produtos
         [HttpGet]
-        [ServiceFilter(typeof(ApiLoggingFilter))]
+        //[ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IQueryable<ProdutoDTO>>> GetProdutos()
         {
             _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
 
-            var produtos = _uof.ProdutoRepository.GetAllAsync();
+            var produtos = await _uof.ProdutoRepository.GetAllAsync();
 
             if (produtos is null)
                 return NotFound();
@@ -233,6 +215,24 @@ namespace APICatalogo.Controllers
             {
                 return StatusCode(500, $"Falha ao excluir objeto de id={id}");
             }*/
+        }
+
+        private ActionResult<IEnumerable<ProdutoDTO>> ObterProdutos(IPagedList<Produto> produtos)
+        {
+            var metadata = new
+            {
+                produtos.Count, //TotalCount,
+                produtos.PageSize,
+                produtos.PageCount,    //CurrentPage,
+                produtos.TotalItemCount,     //TotalPages,
+                produtos.HasNextPage,   //HasNext
+                produtos.HasPreviousPage   //HasPrevious
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
         }
 
         /*//Apenas um teste do uso de IActionResult -> Note: Usado para MVC
