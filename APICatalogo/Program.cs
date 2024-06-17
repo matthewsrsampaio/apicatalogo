@@ -90,11 +90,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 //Registro do serviço do filtro
 builder.Services.AddScoped<ApiLoggingFilter>(); // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
 
-//Registro do repositório de categoria
+//Registro do repositório de categoria; Injeta as dependências
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();  // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); // -> Add o repositório genérico e sua interface
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); //Add Unit of Work
+builder.Services.AddScoped<ITokenService, TokenService>(); //Add TokenServices
 
 
 //ADD Provedor do LOG personalizado ao sistema de log do ASP.NET Core definindo o nível mínimo de LOG
