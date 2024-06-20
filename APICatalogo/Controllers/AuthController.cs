@@ -38,11 +38,10 @@ namespace APICatalogo.Controllers
             {   
                 //Obtém os perfis do usuário
                 var userRoles = await _userManager.GetRolesAsync(user);
-                Console.WriteLine("UserRoles = "+userRoles);
 
                 if(userRoles is EmptyResult)
                 {
-                    return Unauthorized("Não encontramos nada.");
+                    return Unauthorized("Nenhum papel foi encontrado para este usuário.");
                 }
                 
                 //lista das claims que são informações do usuário que serão incluídas no token
@@ -83,7 +82,7 @@ namespace APICatalogo.Controllers
                     Expiration = token.ValidTo
                 });
             }
-            return Unauthorized("porra é essa");
+            return Unauthorized("Dados inválidos");
         }
 
         [HttpPost]

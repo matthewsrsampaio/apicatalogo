@@ -70,6 +70,8 @@ public class CategoriasController : ControllerBase
         return meuServico.saudacao(nome);
     }
 
+    //[Authorize(AuthenticationSchemes = "Bearer")] //Usei essa abordagem pq a autenticação não estava funcionando
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategorias()
     {
