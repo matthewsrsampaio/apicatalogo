@@ -5,9 +5,9 @@ namespace APICatalogo.DTOs
     public class LoginModel
     {
         [Required(ErrorMessage = "User name is required")]
-        public string? username {  get; set; }
+        public string? Username {  get; set; }
 
         [Required(ErrorMessage = "Password is required")]
-        public string? password { get; set; }
+        public string? Password { get; set; }
     }
 }

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -39,7 +40,35 @@ builder.Services.AddTransient<IMeuServico, MeuServico>(); //Sempre que eu invoca
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//Fazendo com que o Swagger exiga o token
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "apicatalogo", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Bearer JWT",
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 //Outra forma de se obter informações sobrbe as configurações
 var valor1 = builder.Configuration["chave1"];
@@ -80,7 +109,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 //Registro de registro de autenticação JWT
-builder.Services.AddAuthentication("Bearer").AddJwtBearer();
+//builder.Services.AddAuthentication("Bearer").AddJwtBearer();
 
 //Registro de configuração do Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

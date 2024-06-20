@@ -1,6 +1,7 @@
 ﻿using APICatalogo.DTOs;
 using APICatalogo.Models;
 using APICatalogo.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -30,11 +31,20 @@ namespace APICatalogo.Controllers
         [Route("login")]                        //Receberá no body do request as credenciais                   
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {   //Busca pelo o usuário e verifica se ele existe ou não
-            var user = await _userManager.FindByNameAsync(model.username!);//A exclamação da a certeza de que esse valor não será nulo.
+            var user = await _userManager.FindByNameAsync(model.Username!);//A exclamação da a certeza de que esse valor não será nulo.
+
             //Verifica se o usuário é nulo e se a senha é verdadeira
-            if(user is not null && await _userManager.CheckPasswordAsync(user, model.password!))
-            {   //Obtém os perfis do usuário
+            if(user is not null && await _userManager.CheckPasswordAsync(user, model.Password!))
+            {   
+                //Obtém os perfis do usuário
                 var userRoles = await _userManager.GetRolesAsync(user);
+                Console.WriteLine("UserRoles = "+userRoles);
+
+                if(userRoles is EmptyResult)
+                {
+                    return Unauthorized("Não encontramos nada.");
+                }
+                
                 //lista das claims que são informações do usuário que serão incluídas no token
                 var authClaims = new List<Claim>
                 {
@@ -43,20 +53,27 @@ namespace APICatalogo.Controllers
                     //Essa claim dará um identificador exclusico para o token
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
+            
                 //Vai iterar sobre cada perfil de usuário
                 foreach(var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
+                
                 //Gera o token
                 var token = _tokenService.GenerateAccessToken(authClaims, _configuration);
+                
                 //Gera token de atualização
                 var refreshToken = _tokenService.GenerateRefreshToken();
+                
                 //Faz uso do descarte " _ " apenas para converter a string recebida em inteiro. Graças ao "out" o valor ja sai direto em refreshTokenValidityInMinutes.
                 _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInMinutes"], out int refreshTokenValidityInMinutes);
+                
                 user.RefreshToken = refreshToken;
+                
                 //Add valor a Expiração de tempo de vida do token
                 user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(refreshTokenValidityInMinutes);
+                
                 //Persiste as novas informações no Banco de Dados
                 await _userManager.UpdateAsync(user);
                 return Ok(new //Retorna token, refreshToken e data de expiração
@@ -66,7 +83,7 @@ namespace APICatalogo.Controllers
                     Expiration = token.ValidTo
                 });
             }
-            return Unauthorized();
+            return Unauthorized("porra é essa");
         }
 
         [HttpPost]
@@ -88,7 +105,7 @@ namespace APICatalogo.Controllers
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username
             };
-
+            //Cria usuário e senha assíncrona
             var result = await _userManager.CreateAsync(user, model.Password!);
 
             if (!result.Succeeded)
@@ -142,6 +159,24 @@ namespace APICatalogo.Controllers
                 accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
                 refreshToken = newRefreshToken
             });
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("revoke/{username}")]
+        public async Task<IActionResult> Revoke(string username)
+        {
+            //Procuro  pelo usuário no banco
+            var user = await _userManager.FindByNameAsync(username);
+
+            if (user == null)
+                return BadRequest("Invalid user name");
+            //Se o usuário for encontrado eu atribuo nulo ao seu RefreshToken
+            user.RefreshToken = null;
+            //Salvo as informações que foram feitas
+            await _userManager.UpdateAsync(user);
+            //Retorno sem conteúdo
+            return NoContent();
         }
 
     }

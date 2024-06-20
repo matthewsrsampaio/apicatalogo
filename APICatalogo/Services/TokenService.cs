@@ -11,7 +11,7 @@ namespace APICatalogo.Services
         public JwtSecurityToken GenerateAccessToken(IEnumerable<Claim> claims, IConfiguration _config)
         {
             //Cria chave a partir dos dados inseridos em appsettings.json
-            var key = _config.GetSection("JWT").GetValue<string>("SecreKey") ?? throw new InvalidOperationException("Invalid secret key");
+            var key = _config.GetSection("JWT").GetValue<string>("SecretKey") ?? throw new InvalidOperationException("Invalid secret key");
             //Cria chave privada em um array de bytes
             var privateKey = Encoding.UTF8.GetBytes(key);
             //Cria as credenciais que serão usadas para assinar o token

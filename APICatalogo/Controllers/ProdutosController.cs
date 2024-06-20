@@ -4,6 +4,7 @@ using APICatalogo.Filters;
 using APICatalogo.Pagination;
 using APICatalogo.Repositories;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -42,6 +43,7 @@ namespace APICatalogo.Controllers
             return ObterProdutos(produtos);
         }
 
+        [Authorize]
         //api/produtos
         [HttpGet]
         //[ServiceFilter(typeof(ApiLoggingFilter))]
