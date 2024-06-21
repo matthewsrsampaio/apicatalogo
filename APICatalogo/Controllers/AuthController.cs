@@ -28,22 +28,17 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        [Route("login")]                        //Receberá no body do request as credenciais                   
+        [Route("Auth/login")]                        //Receberá no body do request as credenciais                   
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {   //Busca pelo o usuário e verifica se ele existe ou não
             var user = await _userManager.FindByNameAsync(model.Username!);//A exclamação da a certeza de que esse valor não será nulo.
 
             //Verifica se o usuário é nulo e se a senha é verdadeira
             if(user is not null && await _userManager.CheckPasswordAsync(user, model.Password!))
-            {   
+            {
                 //Obtém os perfis do usuário
                 var userRoles = await _userManager.GetRolesAsync(user);
 
-                if(userRoles is EmptyResult)
-                {
-                    return Unauthorized("Nenhum papel foi encontrado para este usuário.");
-                }
-                
                 //lista das claims que são informações do usuário que serão incluídas no token
                 var authClaims = new List<Claim>
                 {
@@ -75,7 +70,7 @@ namespace APICatalogo.Controllers
                 
                 //Persiste as novas informações no Banco de Dados
                 await _userManager.UpdateAsync(user);
-                return Ok(new //Retorna token, refreshToken e data de expiração
+                return Ok(new //Retorna token, refreshToken e data de expiração no cabeçalho
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                     RefreshToken = refreshToken,
@@ -86,7 +81,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        [Route("register")]
+        [Route("Auth/register")]
         public async Task<IActionResult> Register ([FromBody] RegisterModel model){
             //Verifica se o usuário existe
             var userExists = await _userManager.FindByNameAsync(model.Username!);
@@ -117,8 +112,8 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        [Route("refresh-token")]
-        public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
+        [Route("Auth/refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] TokenModel tokenModel)
         {
             if(tokenModel is null)
             {
@@ -133,16 +128,21 @@ namespace APICatalogo.Controllers
 
             if(principal == null)
             {
-                return BadRequest("Invalid access token / refresh token");
+                return BadRequest("Principal is null. Invalid access token / refresh token");
             }
+
             //Extrai o nome do usuário da base de dados
             var username = principal.Identity.Name;
             //COm o nome do usuário vai ser possível buscar ele no banco de dados
             var user = await _userManager.FindByNameAsync(username!);
 
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime >= DateTime.Now)
             {
-                return BadRequest("Invalid access token / refresh token");
+                return BadRequest($"User is null {user.UserName} or " +
+                    $"\nResfreshToken is different {user.RefreshToken} or " +
+                    $"\nRefresh Token Expiry time is over {user.RefreshTokenExpiryTime}. " +
+                    $"\nHora atual: {DateTime.Now}" +
+                    $"\nInvalid access token / refresh token");
             }
             //Gera um novo token
             var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList(), _configuration);
@@ -162,7 +162,7 @@ namespace APICatalogo.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("revoke/{username}")]
+        [Route("Auth/revoke/{username}")]
         public async Task<IActionResult> Revoke(string username)
         {
             //Procuro  pelo usuário no banco
