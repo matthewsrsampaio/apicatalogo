@@ -15,16 +15,19 @@ namespace APICatalogo.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ITokenService tokenService, 
-                              UserManager<ApplicationUser> userManager, 
-                              RoleManager<IdentityRole> roleManager, 
-                              IConfiguration configuration)
+        public AuthController(ITokenService tokenService,
+                              UserManager<ApplicationUser> userManager,
+                              RoleManager<IdentityRole> roleManager,
+                              IConfiguration configuration,
+                              ILogger<AuthController> logger)
         {
             _tokenService = tokenService;
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -34,7 +37,7 @@ namespace APICatalogo.Controllers
             var user = await _userManager.FindByNameAsync(model.Username!);//A exclamação da a certeza de que esse valor não será nulo.
 
             //Verifica se o usuário é nulo e se a senha é verdadeira
-            if(user is not null && await _userManager.CheckPasswordAsync(user, model.Password!))
+            if (user is not null && await _userManager.CheckPasswordAsync(user, model.Password!))
             {
                 //Obtém os perfis do usuário
                 var userRoles = await _userManager.GetRolesAsync(user);
@@ -47,27 +50,27 @@ namespace APICatalogo.Controllers
                     //Essa claim dará um identificador exclusico para o token
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
-            
+
                 //Vai iterar sobre cada perfil de usuário
-                foreach(var userRole in userRoles)
+                foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
-                
+
                 //Gera o token
                 var token = _tokenService.GenerateAccessToken(authClaims, _configuration);
-                
+
                 //Gera token de atualização
                 var refreshToken = _tokenService.GenerateRefreshToken();
-                
+
                 //Faz uso do descarte " _ " apenas para converter a string recebida em inteiro. Graças ao "out" o valor ja sai direto em refreshTokenValidityInMinutes.
                 _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInMinutes"], out int refreshTokenValidityInMinutes);
-                
+
                 user.RefreshToken = refreshToken;
-                
+
                 //Add valor a Expiração de tempo de vida do token
                 user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(refreshTokenValidityInMinutes);
-                
+
                 //Persiste as novas informações no Banco de Dados
                 await _userManager.UpdateAsync(user);
                 return Ok(new //Retorna token, refreshToken e data de expiração no cabeçalho
@@ -82,10 +85,11 @@ namespace APICatalogo.Controllers
 
         [HttpPost]
         [Route("Auth/register")]
-        public async Task<IActionResult> Register ([FromBody] RegisterModel model){
+        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        {
             //Verifica se o usuário existe
             var userExists = await _userManager.FindByNameAsync(model.Username!);
-            
+
             if (userExists != null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
@@ -115,7 +119,7 @@ namespace APICatalogo.Controllers
         [Route("Auth/refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] TokenModel tokenModel)
         {
-            if(tokenModel is null)
+            if (tokenModel is null)
             {
                 return BadRequest("Invalid client request");
             }
@@ -126,7 +130,7 @@ namespace APICatalogo.Controllers
             //Extrai a identidade do usuário do token expirado
             var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken!, _configuration);
 
-            if(principal == null)
+            if (principal == null)
             {
                 return BadRequest("Principal is null. Invalid access token / refresh token");
             }
@@ -138,7 +142,8 @@ namespace APICatalogo.Controllers
 
             if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime >= DateTime.Now)
             {
-                return BadRequest($"User is null {user.UserName} or " +
+                return BadRequest(
+                    $"\nUser is null {user.UserName} or " +
                     $"\nResfreshToken is different {user.RefreshToken} or " +
                     $"\nRefresh Token Expiry time is over {user.RefreshTokenExpiryTime}. " +
                     $"\nHora atual: {DateTime.Now}" +
@@ -178,5 +183,40 @@ namespace APICatalogo.Controllers
             return NoContent();
         }
 
+        [HttpPost]
+        [Route("CreateRole")]
+        public async Task<IActionResult> CreateRole(string roleName)
+        {
+            var roleExist = await _roleManager.RoleExistsAsync(roleName);
+            //Verifica se essa role ja existe
+            if (!roleExist)
+            {
+                //Se a role não existir eu crio uma nova
+                var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+                //Se a criação tiver sido feita com sucesso
+                if (roleResult.Succeeded)
+                {
+                    _logger.LogInformation(1, "Roles Added");
+                    return StatusCode(StatusCodes.Status200OK,
+                        new Response { 
+                            Status = "Success", 
+                            Message = $"Role {roleName} added successfuly" 
+                        });
+                }
+                //Se a criação da roole tiver falhado
+                else
+                {
+                    _logger.LogInformation(2, "Error");
+                    return StatusCode(StatusCodes.Status400BadRequest,
+                        new Response { 
+                            Status = "Error", 
+                            Message = $"Issue adding the new {roleName} role" 
+                        });
+                }
+            }
+            //se a role já existir
+            return StatusCode(StatusCodes.Status400BadRequest,
+                new Response { Status = "Error", Message = "Role already exist" });
+        }
     }
 }
