@@ -218,5 +218,43 @@ namespace APICatalogo.Controllers
             return StatusCode(StatusCodes.Status400BadRequest,
                 new Response { Status = "Error", Message = "Role already exist" });
         }
+
+        [HttpPost]
+        [Route("AddUserRole")]
+        public async Task<IActionResult> AddUserToRole(string email, string name, string roleName)
+        {
+            var user_email = await _userManager.FindByEmailAsync(email);
+            var user_name = await _userManager.FindByNameAsync(name);
+            
+            if (user_email != null && user_name != null && user_name.Id == user_email.Id)
+            {
+                var result = await _userManager.AddToRoleAsync(user_email, roleName);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation(1, $"User {user_email.Email} added to the {roleName} role");
+                    return StatusCode(
+                        StatusCodes.Status200OK,
+                        new Response
+                        {
+                            Status = "Success",
+                            Message = $"User {user_email.Email} added to the {roleName} role"
+                        });
+                }
+                else
+                {
+                    _logger.LogInformation(1, $"Error: Unable to add user {user_email.Email} to the {roleName} role");
+                    return StatusCode(
+                        StatusCodes.Status400BadRequest,
+                        new Response
+                        {
+                            Status = "Error",
+                            Message = $"Error: Unable to add user {user_email.Email} to the {roleName} role"
+                        });
+                }
+            }
+
+            return BadRequest(new { error = "Unable to find user" });
+        }
     }
 }
