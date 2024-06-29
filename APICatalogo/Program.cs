@@ -116,6 +116,22 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("SuperAdminOnly", policy => policy
+                                                    .RequireRole("Admin")
+                                                    .RequireClaim("id", "matthews")
+    );
+    options.AddPolicy("User", policy => policy.RequireRole("User"));
+    options.AddPolicy("ExclusivePolicyOnly", policy =>
+                                                policy.RequireAssertion(context =>
+                                                    context.User.HasClaim(claim =>
+                                                        claim.Type == "id" && claim.Value == "matthews")
+                                                        ||  context.User.IsInRole("SuperAdmin")   
+    ));
+});
+
 //Registro do serviço do filtro
 builder.Services.AddScoped<ApiLoggingFilter>(); // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
 

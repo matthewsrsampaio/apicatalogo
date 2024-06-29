@@ -46,8 +46,8 @@ namespace APICatalogo.Controllers
         //api/produtos
         //[ServiceFilter(typeof(ApiLoggingFilter))]
         //[Authorize(AuthenticationSchemes = "Bearer")] //Usei essa abordagem pq a autenticação não estava funcionando
-        [Authorize]
         [HttpGet]
+        [Authorize(Policy = "UserOnly")]
         public async Task<ActionResult<IQueryable<ProdutoDTO>>> GetProdutos()
         {
             _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");

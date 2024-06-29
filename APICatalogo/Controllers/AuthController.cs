@@ -47,6 +47,7 @@ namespace APICatalogo.Controllers
                 {
                     new Claim(ClaimTypes.Name, user.UserName!),
                     new Claim(ClaimTypes.Email, user.Email!),
+                    new Claim("id", user.UserName!),
                     //Essa claim dará um identificador exclusico para o token
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
@@ -93,7 +94,10 @@ namespace APICatalogo.Controllers
             if (userExists != null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  new Response { Status = "Error", Message = "User already exists" });
+                                  new Response { 
+                                      Status = "Error", 
+                                      Message = "User already exists" 
+                                  });
             }
 
             //Cria instancia de Application User e atribui valores
@@ -109,10 +113,19 @@ namespace APICatalogo.Controllers
             if (!result.Succeeded)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  new Response { Status = "Error", Message = "User creation failed" });
+                                  new Response 
+                                  { 
+                                      Status = "Error", 
+                                      Message = "User creation failed" 
+                                  });
             }
 
-            return Ok(new Response { Status = "Success", Message = "User created successfully" });
+            return Ok(
+                new Response
+                { 
+                    Status = "Success", 
+                    Message = "User created successfully" 
+                });
         }
 
         [HttpPost]
@@ -165,8 +178,8 @@ namespace APICatalogo.Controllers
             });
         }
 
-        [Authorize]
         [HttpPost]
+        [Authorize(Policy = "ExclusiveOnly")]
         [Route("Auth/revoke/{username}")]
         public async Task<IActionResult> Revoke(string username)
         {
@@ -184,6 +197,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "SuperAdminOnly")]
         [Route("CreateRole")]
         public async Task<IActionResult> CreateRole(string roleName)
         {
@@ -220,6 +234,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "SuperAdminOnly")]
         [Route("AddUserRole")]
         public async Task<IActionResult> AddUserToRole(string email, string name, string roleName)
         {
@@ -232,24 +247,24 @@ namespace APICatalogo.Controllers
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(1, $"User {user_email.Email} added to the {roleName} role");
+                    _logger.LogInformation(1, $"User {user_name.UserName} - {user_email.Email} added to the {roleName} role");
                     return StatusCode(
                         StatusCodes.Status200OK,
                         new Response
                         {
                             Status = "Success",
-                            Message = $"User {user_email.Email} added to the {roleName} role"
+                            Message = $"User {user_name.UserName} - {user_email.Email} added to the {roleName} role"
                         });
                 }
                 else
                 {
-                    _logger.LogInformation(1, $"Error: Unable to add user {user_email.Email} to the {roleName} role");
+                    _logger.LogInformation(1, $"Error: Unable to add user {user_name.UserName} - {user_email.Email} to the {roleName} role");
                     return StatusCode(
                         StatusCodes.Status400BadRequest,
                         new Response
                         {
                             Status = "Error",
-                            Message = $"Error: Unable to add user {user_email.Email} to the {roleName} role"
+                            Message = $"Error: Unable to add user {user_name.UserName} - {user_email.Email} to the {roleName} role"
                         });
                 }
             }
