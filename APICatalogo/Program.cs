@@ -38,6 +38,36 @@ builder.Services.AddTransient<IMeuServico, MeuServico>(); //Sempre que eu invoca
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+//DFINIR POLITICA CORS USANDO UM NOME ESPECIFICO
+var OrigensComAcessoPermitido = "_origensComAcessoPermitido";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(OrigensComAcessoPermitido,
+        policy =>
+        {
+            policy.WithOrigins("https://apirequest.io")
+            .WithMethods("GET", "POST")
+            .AllowAnyHeader()
+            .AllowCredentials();
+        });
+});
+    
+
+// DEFINIR POLITICA CORS PADRÃO
+/*builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("https://apirequest.io")
+        .WithMethods("GET", "POST")
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
+});
+*/
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 //Fazendo com que o Swagger exiga o token
@@ -165,6 +195,9 @@ if (app.Environment.IsDevelopment()) //Verifico se meu ambiente é o de desenvol
 }
 
 app.UseHttpsRedirection(); //Define o middleware para redirecionar as requisições HTTP para HTTPS
+app.UseStaticFiles(); //habilita o middleware de arquivos estáticos
+app.UseRouting(); // habilita o middleware de roteamento
+app.UseCors(OrigensComAcessoPermitido);
 
 //app.UseAuthentication(); //Define a autenticação do usuário
 
