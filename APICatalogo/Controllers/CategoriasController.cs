@@ -5,13 +5,17 @@ using APICatalogo.Pagination;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Newtonsoft.Json;
 using X.PagedList;
 
 namespace APICatalogo.Controllers;
 
+[EnableCors("OrigensComAcessoPermitido")]
 [Route("api/[controller]")]
+[EnableRateLimiting("fixedwindow")]
 [ApiController]
 public class CategoriasController : ControllerBase
 {
@@ -71,7 +75,8 @@ public class CategoriasController : ControllerBase
     }
 
     //[Authorize(AuthenticationSchemes = "Bearer")] //Usei essa abordagem pq a autenticação não estava funcionando
-    [Authorize]
+    //[Authorize]
+    [DisableRateLimiting]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategorias()
     {
@@ -85,6 +90,7 @@ public class CategoriasController : ControllerBase
         return Ok(categoriaListDto);
     }
 
+    [DisableCors]
     [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
     public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get(int id, string nome)
     {

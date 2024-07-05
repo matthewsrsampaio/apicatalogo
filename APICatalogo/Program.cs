@@ -4,15 +4,18 @@ using APICatalogo.Extensions;
 using APICatalogo.Filters;
 using APICatalogo.Logging;
 using APICatalogo.Models;
+using APICatalogo.RateLimitOptions;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,16 +44,30 @@ builder.Services.AddControllers();
 
 //DFINIR POLITICA CORS USANDO UM NOME ESPECIFICO
 var OrigensComAcessoPermitido = "_origensComAcessoPermitido";
+var PoliticaCORS1 = "_politicaCORS1";
+var PoliticaCORS2 = "_politicaCORS2";
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(OrigensComAcessoPermitido,
         policy =>
         {
-            policy.WithOrigins("https://apirequest.io")
+            policy.WithOrigins("https://localhost:7292")
             .WithMethods("GET", "POST")
-            .AllowAnyHeader()
-            .AllowCredentials();
+            .AllowAnyHeader();
+        });
+    options.AddPolicy(PoliticaCORS1,
+        policy =>
+        {
+            policy.WithOrigins("https://apirequest.io",
+                               "https://globo.com")
+                               .WithMethods("GET");
+        });
+    options.AddPolicy(PoliticaCORS2,
+        policy =>
+        {
+            policy.WithOrigins("https://apirequest.io")
+                               .WithMethods("GET", "DELETE");
         });
 });
     
@@ -162,6 +179,40 @@ builder.Services.AddAuthorization(options =>
     ));
 });
 
+var myOptions = new MyRateLimitOptions();
+
+builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(myOptions);
+
+//Política de limitação de taxa
+builder.Services.AddRateLimiter(rateLimiterOptions =>
+{
+    rateLimiterOptions.AddFixedWindowLimiter(policyName: "fixedwindow", options =>
+    {//Posso fazer uma requisição a cada 5 segundos
+        options.PermitLimit = myOptions.PermitLimit;//1;
+        options.Window = TimeSpan.FromSeconds(myOptions.Window);//TimeSpan.FromSeconds(10);
+        options.QueueLimit = myOptions.QueueLimit;//2;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+    rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ??
+                          httpContext.Request.Headers.Host.ToString(),
+                factory: partition => new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 2,
+                    QueueLimit = 0,
+                    Window = TimeSpan.FromSeconds(10)
+                }));
+});
+
 //Registro do serviço do filtro
 builder.Services.AddScoped<ApiLoggingFilter>(); // =>AddScoped é o tempo de vida do Scopo do request. Isso garante que para cada request haverá uma nova instancia.
 
@@ -197,7 +248,9 @@ if (app.Environment.IsDevelopment()) //Verifico se meu ambiente é o de desenvol
 app.UseHttpsRedirection(); //Define o middleware para redirecionar as requisições HTTP para HTTPS
 app.UseStaticFiles(); //habilita o middleware de arquivos estáticos
 app.UseRouting(); // habilita o middleware de roteamento
-app.UseCors(OrigensComAcessoPermitido);
+//app.UseCors(OrigensComAcessoPermitido);
+app.UseRateLimiter();//Aplica as limitações de taxa definidas acima
+app.UseCors();
 
 //app.UseAuthentication(); //Define a autenticação do usuário
 
