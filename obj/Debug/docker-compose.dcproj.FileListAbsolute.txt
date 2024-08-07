@@ -37,3 +37,8 @@ D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Microsoft.AspNetCore.Cryptography.Ke
 D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Microsoft.IdentityModel.Logging.dll
 D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Microsoft.IdentityModel.Abstractions.dll
 D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Microsoft.AspNetCore.Cryptography.Internal.dll
+D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Asp.Versioning.Http.dll
+D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Asp.Versioning.Mvc.ApiExplorer.dll
+D:\DEV\Projetos em C#\APICatalogo\bin\Debug\System.Text.Json.dll
+D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Asp.Versioning.Abstractions.dll
+D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Asp.Versioning.Mvc.dll

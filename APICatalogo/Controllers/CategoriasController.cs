@@ -17,6 +17,7 @@ namespace APICatalogo.Controllers;
 [Route("api/[controller]")]
 [EnableRateLimiting("fixedwindow")]
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class CategoriasController : ControllerBase
 {
     //private readonly ICategoriaRepository _repository;

@@ -7,6 +7,7 @@ using APICatalogo.Models;
 using APICatalogo.RateLimitOptions;
 using APICatalogo.Repositories;
 using APICatalogo.Services;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -211,6 +212,22 @@ builder.Services.AddRateLimiter(options =>
                     QueueLimit = 0,
                     Window = TimeSpan.FromSeconds(10)
                 }));
+});
+
+//Adiciona os serviços de Versionamento da API
+builder.Services.AddApiVersioning(o =>
+{
+    o.DefaultApiVersion = new ApiVersion(1, 0);
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.ReportApiVersions = true;
+    //Por padrão o leitor de versao da api é por Query
+    o.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader(),
+        new UrlSegmentApiVersionReader());//Agora nós suportamos a leitura da versão pela URL
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
 });
 
 //Registro do serviço do filtro

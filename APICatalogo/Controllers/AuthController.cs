@@ -9,6 +9,7 @@ using System.Security.Claims;
 
 namespace APICatalogo.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AuthController : ControllerBase
     {
         private readonly ITokenService _tokenService;

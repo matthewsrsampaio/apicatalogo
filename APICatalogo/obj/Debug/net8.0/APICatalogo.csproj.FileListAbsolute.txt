@@ -124,3 +124,10 @@ D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.AspNetC
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Asp.Versioning.Abstractions.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Asp.Versioning.Http.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Asp.Versioning.Mvc.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Asp.Versioning.Mvc.ApiExplorer.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\System.Security.Permissions.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\System.Text.Json.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\X.PagedList.Web.Common.dll
