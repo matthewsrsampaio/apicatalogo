@@ -14,7 +14,7 @@ namespace APICatalogo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [ApiExplorerSettings(IgnoreApi = true)]
+    //[ApiExplorerSettings(IgnoreApi = true)]
     public class ProdutosController : ControllerBase
     {
         //private readonly IProdutoRepository _produtoRepository;
@@ -44,7 +44,10 @@ namespace APICatalogo.Controllers
             return ObterProdutos(produtos);
         }
 
-        //api/produtos
+        /// <summary>
+        /// Exibe uma relação dos produtos
+        /// </summary>
+        /// <returns>Retorna uma lista de objetos Produto</returns>
         //[ServiceFilter(typeof(ApiLoggingFilter))]
         //[Authorize(AuthenticationSchemes = "Bearer")] //Usei essa abordagem pq a autenticação não estava funcionando
         [HttpGet]
@@ -64,7 +67,11 @@ namespace APICatalogo.Controllers
             return Ok(produtoDto);
         }
 
-        //api/produtosPorCategoria/id
+        /// <summary>
+        /// Obtem um produto pelo seu identificador produtoId
+        /// </summary>
+        /// <param name="id">Código do produto</param>
+        /// <returns>Um objeto do tipo Produto</returns>
         [HttpGet("produtosPorCategoria/{id}")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosCategoria(int id)
         {

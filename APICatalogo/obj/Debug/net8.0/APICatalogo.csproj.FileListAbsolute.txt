@@ -129,5 +129,6 @@ D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Asp.Versioning.Ht
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Asp.Versioning.Mvc.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\Asp.Versioning.Mvc.ApiExplorer.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\System.Security.Permissions.dll
-D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\System.Text.Json.dll
 D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\X.PagedList.Web.Common.dll
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\bin\Debug\net8.0\APICatalogo.xml
+D:\DEV\Projetos em C#\APICatalogo\APICatalogo\obj\Debug\net8.0\APICatalogo.xml

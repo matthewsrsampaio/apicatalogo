@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -91,7 +92,30 @@ builder.Services.AddEndpointsApiExplorer();
 //Fazendo com que o Swagger exiga o token
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "apicatalogo", Version = "v1" });
+    /*c.SwaggerDoc("v1", new OpenApiInfo { Title = "apicatalogo", Version = "v1" });
+    c.SwaggerDoc("v2", new OpenApiInfo { Title = "apicatalogo", Version = "v2" });*/
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "APICatalogo",
+        Description = "Catálogo de Produtos e Categorias",
+        TermsOfService = new Uri("https://matthewsrsampaio.github.io/swapi"),
+        Contact = new OpenApiContact
+        {
+            Name = "matthews",
+            Email = "matthewsrsampaio@outlook.com",
+            Url = new Uri("https://matthewsrsampaio.github.io/swapi")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Usar sobre LICX",
+            Url = new Uri("https://matthewsrsampaio.github.io/swapi")
+        }
+    });
+
+    //Add comentários XML ao Swagger
+    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
@@ -256,8 +280,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) //Verifico se meu ambiente é o de desenvolvimento
 {
-    app.UseSwagger(); //Define o middleware do SWAGGER
-    app.UseSwaggerUI(); //Define o middlewware SWAGGER UserInterface
+    app.UseSwagger(); //Habilita o middleware para servir o SWAGGER e é gerado como um endpoint JSON
+    //app.UseSwaggerUI(); //Habilita o middleware de arquivos estáticos
+    
+    //Habilitar o SwaggerUI de forma mais específica (nao precisaria no meu caso)
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json",
+            "APICatalogo");
+    });
     app.ConfigureExceptionHandler();
     //app.UseDeveloperExceptionPage();
 }

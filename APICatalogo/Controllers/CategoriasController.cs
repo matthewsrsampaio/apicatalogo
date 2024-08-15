@@ -17,7 +17,7 @@ namespace APICatalogo.Controllers;
 [Route("api/[controller]")]
 [EnableRateLimiting("fixedwindow")]
 [ApiController]
-[ApiExplorerSettings(IgnoreApi = true)]
+//[ApiExplorerSettings(IgnoreApi = true)]
 public class CategoriasController : ControllerBase
 {
     //private readonly ICategoriaRepository _repository;
@@ -75,6 +75,10 @@ public class CategoriasController : ControllerBase
         return meuServico.saudacao(nome);
     }
 
+    /// <summary>
+    /// Obtem uma lista de objetos Categoria
+    /// </summary>
+    /// <returns>Uma lista de objetos Categoria</returns>
     //[Authorize(AuthenticationSchemes = "Bearer")] //Usei essa abordagem pq a autenticação não estava funcionando
     //[Authorize]
     [DisableRateLimiting]
@@ -91,6 +95,12 @@ public class CategoriasController : ControllerBase
         return Ok(categoriaListDto);
     }
 
+    /// <summary>
+    /// Obtem uma categoria pelo seu ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="nome"></param>
+    /// <returns>Objetos Categoria</returns>
     [DisableCors]
     [HttpGet("{id:int}/{nome:alpha:minlength(3)=abc}", Name = "ObterCategoria")] //{nome:alpha:minlength(3)=abc} -> quer dizer que eu espero receber pelo menos 3 caracteres alphanumericos, mas se eu nao receber eles, por padrão, eu receberei "abc"
     public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get(int id, string nome)
@@ -115,6 +125,21 @@ public class CategoriasController : ControllerBase
         return Ok(categoriaDTO);
     }
 
+    /// <summary>
+    /// Inclui uma nova categoria
+    /// </summary>
+    /// <remarks>
+    /// Exemplo de request:
+    ///     POST api/categorias
+    ///         {
+    ///             "categoriaId": 1,
+    ///             "nome": "categoria1",
+    ///             "imagemUrl": "http://teste.net/1.jpg"
+    ///         }
+    /// </remarks>
+    /// <param name="categoriaDto">objeto Categoria</param>
+    /// <remarks>Retorna um objeto Categoria incluído</remarks>
+    /// <returns></returns>
     [HttpPost]
     public async Task<ActionResult<CategoriaDTO>> Post(CategoriaDTO categoriaDto)
     {
@@ -138,6 +163,7 @@ public class CategoriasController : ControllerBase
                novaCategoriaDto);
     }
 
+    #pragma warning disable CS1591
     [HttpPut("{id:int}")]
     public async Task<ActionResult<CategoriaDTO>> Put(int id, CategoriaDTO categoriaDto)
     {
@@ -158,6 +184,7 @@ public class CategoriasController : ControllerBase
 
         return Ok(categoriaAtualizadaDto);
     }
+    #pragma warning restore CS1591
 
     [HttpDelete("{id:int}")]
     [Authorize(Policy = "AdminOnly")]
