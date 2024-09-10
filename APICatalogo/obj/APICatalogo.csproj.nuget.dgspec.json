@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DEV\\Projetos em C#\\APICatalogo\\APICatalogo\\APICatalogo.csproj": {}
+    "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj": {}
   },
   "projects": {
-    "D:\\DEV\\Projetos em C#\\APICatalogo\\APICatalogo\\APICatalogo.csproj": {
+    "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEV\\Projetos em C#\\APICatalogo\\APICatalogo\\APICatalogo.csproj",
+        "projectUniqueName": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
         "projectName": "APICatalogo",
-        "projectPath": "D:\\DEV\\Projetos em C#\\APICatalogo\\APICatalogo\\APICatalogo.csproj",
-        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "D:\\DEV\\Projetos em C#\\APICatalogo\\APICatalogo\\obj\\",
+        "projectPath": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
+        "packagesPath": "C:\\Users\\Matthews\\.nuget\\packages\\",
+        "outputPath": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Matthews\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -122,7 +122,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -5,16 +5,21 @@ using APICatalogo.Pagination;
 using APICatalogo.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Newtonsoft.Json;
 using X.PagedList;
 
 namespace APICatalogo.Controllers
 {
+    [EnableCors("OrigensComAcessoPermitido")]
     [Route("api/[controller]")]
+    [EnableRateLimiting("fixedwindow")]
     [ApiController]
     //[ApiExplorerSettings(IgnoreApi = true)]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class ProdutosController : ControllerBase
     {
         //private readonly IProdutoRepository _produtoRepository;
@@ -23,10 +28,10 @@ namespace APICatalogo.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public ProdutosController(IUnitOfWork uof, ILogger<ProdutosController> logger, IMapper mapper)
+        public ProdutosController(IUnitOfWork uof, IMapper mapper /*ILogger<ProdutosController> logger*/)
         {
             _uof = uof;
-            _logger = logger;
+            //_logger = logger;
             _mapper = mapper;
         }
 
@@ -90,16 +95,22 @@ namespace APICatalogo.Controllers
             return Ok(produtoDto);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id:int}", Name = "ObterProdutos")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<ProdutoDTO>> GetProduto(int id)
+        public async Task<ActionResult<ProdutoDTO>> GetProduto(int? id)
         {
+            if (id == null || id <= 0)
+                return BadRequest("ID de produto inválido");
+
             var produto = await _uof.ProdutoRepository.GetAsync(p => p.ProdutoId == id);
 
             if (produto is null)
                 NotFound($"Produto de id = {id} não foi encontrado.");
 
-            _logger.LogInformation($"=================== Log - Information  GET api/produtos/{id} ===================== ");
+            //_logger.LogInformation($"=================== Log - Information  GET api/produtos/{id} ===================== ");
 
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoDto = _mapper.Map<ProdutoDTO>(produto);  
