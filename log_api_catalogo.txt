@@ -1059,3 +1059,18 @@ Information: 0 - Content root path: D:\DEV\Projetos C#\apicatalogo\APICatalogo
 Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
 SELECT `c`.`CategoriaId`, `c`.`ImagemUrl`, `c`.`Nome`
 FROM `Categorias` AS `c`
+Warning: WebRootPathNotFound - The WebRootPath was not found: D:\DEV\Projetos C#\apicatalogo\APICatalogo\wwwroot. Static files may be unavailable.
+Information: ListeningOnAddress - Now listening on: https://localhost:7134
+Information: ListeningOnAddress - Now listening on: http://localhost:5033
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: D:\DEV\Projetos C#\apicatalogo\APICatalogo
+Warning: WebRootPathNotFound - The WebRootPath was not found: D:\DEV\Projetos C#\apicatalogo\APICatalogo\wwwroot. Static files may be unavailable.
+Information: ListeningOnAddress - Now listening on: https://localhost:7134
+Information: ListeningOnAddress - Now listening on: http://localhost:5033
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: D:\DEV\Projetos C#\apicatalogo\APICatalogo
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (16ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`CategoriaId`, `c`.`ImagemUrl`, `c`.`Nome`
+FROM `Categorias` AS `c`

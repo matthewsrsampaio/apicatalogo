@@ -526,7 +526,7 @@
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.Int32",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": true
       },
       {
@@ -552,7 +552,7 @@
           "application/json",
           "text/json"
         ],
-        "StatusCode": 404
+        "StatusCode": 400
       },
       {
         "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
@@ -561,7 +561,7 @@
           "application/json",
           "text/json"
         ],
-        "StatusCode": 0
+        "StatusCode": 404
       }
     ],
     "EndpointName": "ObterProdutos"

@@ -26,7 +26,7 @@ namespace APICatalogo.Controllers
         //private readonly IRepository<Produto> _repository;
         private readonly IUnitOfWork _uof;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
+        //private readonly ILogger _logger;
 
         public ProdutosController(IUnitOfWork uof, IMapper mapper /*ILogger<ProdutosController> logger*/)
         {
@@ -55,21 +55,33 @@ namespace APICatalogo.Controllers
         /// <returns>Retorna uma lista de objetos Produto</returns>
         //[ServiceFilter(typeof(ApiLoggingFilter))]
         //[Authorize(AuthenticationSchemes = "Bearer")] //Usei essa abordagem pq a autenticação não estava funcionando
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet]
         //[Authorize(Policy = "UserOnly")]
         public async Task<ActionResult<IQueryable<ProdutoDTO>>> GetProdutos()
         {
-            _logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
+            try
+            {
+                //_logger.LogInformation($"=================== Log-Information  GET api/produtos =====================");
 
-            var produtos = await _uof.ProdutoRepository.GetAllAsync();
+                var produtos = await _uof.ProdutoRepository.GetAllAsync();
 
-            if (produtos is null)
-                return NotFound();
+                if (produtos is null)
+                    return NotFound();
 
-            //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
-            var produtoDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+                //throw new Exception();
 
-            return Ok(produtoDto);
+                //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
+                var produtoDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+
+                return Ok(produtoDto);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
         /// <summary>
@@ -87,7 +99,7 @@ namespace APICatalogo.Controllers
                 return NotFound();
             }
 
-            _logger.LogInformation($"==============     PUT     ==============");
+            //_logger.LogInformation($"==============     PUT     ==============");
 
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produto);
@@ -99,17 +111,21 @@ namespace APICatalogo.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id:int}", Name = "ObterProdutos")]
-        [ServiceFilter(typeof(ApiLoggingFilter))]
+        //[ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<ProdutoDTO>> GetProduto(int? id)
         {
             if (id == null || id <= 0)
-                return BadRequest("ID de produto inválido");
+            {
+                return BadRequest("id de produto inválido");
+            }
 
             var produto = await _uof.ProdutoRepository.GetAsync(p => p.ProdutoId == id);
 
             if (produto is null)
+            {
+                //return NotFound();
                 NotFound($"Produto de id = {id} não foi encontrado.");
-
+            }
             //_logger.LogInformation($"=================== Log - Information  GET api/produtos/{id} ===================== ");
 
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
@@ -124,7 +140,7 @@ namespace APICatalogo.Controllers
         {
             if (produtoDto is null)
             {
-                _logger.LogWarning("POST - Dados inválidos.");
+                //_logger.LogWarning("POST - Dados inválidos.");
                 return BadRequest();
             }
 
@@ -137,8 +153,8 @@ namespace APICatalogo.Controllers
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoCriadoDto = _mapper.Map<ProdutoDTO>(produtoCriado);
 
-            _logger.LogInformation($"=================== Log - Information  POST api/produtos ===================== ");
-            _logger.LogInformation($"=================== POST id = {produtoCriadoDto.ProdutoId}, produto = {produtoCriadoDto.Nome} ===================== ");
+            //_logger.LogInformation($"=================== Log - Information  POST api/produtos ===================== ");
+            //_logger.LogInformation($"=================== POST id = {produtoCriadoDto.ProdutoId}, produto = {produtoCriadoDto.Nome} ===================== ");
 
             return Ok(new CreatedAtRouteResult("ObterProdutos", new { id = produtoCriadoDto.ProdutoId }, produtoCriadoDto));
         }
@@ -152,7 +168,7 @@ namespace APICatalogo.Controllers
 
             if (id != produto.ProdutoId)
             {
-               _logger.LogWarning("PUT - Dados inválidos.");
+               //_logger.LogWarning("PUT - Dados inválidos.");
                 return BadRequest();
             }
 
@@ -162,8 +178,8 @@ namespace APICatalogo.Controllers
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoAtualizadoDto = _mapper.Map<ProdutoDTO>(produtoAtualizado);
 
-            _logger.LogInformation($"==============     PUT     ==============");
-            _logger.LogInformation($"Produto de id={id} foi atualizado.");
+            //_logger.LogInformation($"==============     PUT     ==============");
+            //_logger.LogInformation($"Produto de id={id} foi atualizado.");
 
             return Ok(produtoAtualizadoDto);
         }
@@ -223,8 +239,8 @@ namespace APICatalogo.Controllers
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
             var produtoExcluidoDto = _mapper.Map<ProdutoDTO>(produtoExcluido);
 
-            _logger.LogInformation($"==============     DELETE     ==============");
-            _logger.LogWarning($"Produto de id={id} foi deletado.");
+            //_logger.LogInformation($"==============     DELETE     ==============");
+            //_logger.LogWarning($"Produto de id={id} foi deletado.");
 
             return Ok(produtoExcluidoDto);
 
