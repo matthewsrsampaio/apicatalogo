@@ -6,6 +6,7 @@ using APICatalogo.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -135,7 +136,9 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(ApiLoggingFilter))]
+        //[ServiceFilter(typeof(ApiLoggingFilter))]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ProdutoDTO>> Post(ProdutoDTO produtoDto)
         {
             if (produtoDto is null)
@@ -156,11 +159,13 @@ namespace APICatalogo.Controllers
             //_logger.LogInformation($"=================== Log - Information  POST api/produtos ===================== ");
             //_logger.LogInformation($"=================== POST id = {produtoCriadoDto.ProdutoId}, produto = {produtoCriadoDto.Nome} ===================== ");
 
-            return Ok(new CreatedAtRouteResult("ObterProdutos", new { id = produtoCriadoDto.ProdutoId }, produtoCriadoDto));
+            return new CreatedAtRouteResult("ObterProdutos", new { id = produtoCriadoDto.ProdutoId }, produtoCriadoDto);
         }
 
         [HttpPut("{id:int}")]
-        [ServiceFilter(typeof(ApiLoggingFilter))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<ProdutoDTO>> Put(int id, ProdutoDTO produtoDto)
         {
             //var destino = _mapper.Map<Destino>(origem);   -> Aqui estamos usando Map do pct AutoMapper.
@@ -225,7 +230,9 @@ namespace APICatalogo.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [ServiceFilter(typeof(ApiLoggingFilter))]
+        //[ServiceFilter(typeof(ApiLoggingFilter))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProdutoDTO>> Delete(int id)
         {   
             var produto = await _uof.ProdutoRepository.GetAsync(d => d.ProdutoId == id);

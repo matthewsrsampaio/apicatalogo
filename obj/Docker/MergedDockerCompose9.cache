@@ -1,0 +1,85 @@
+name: dockercompose13484724540897623862
+services:
+  apiCatalogo.database:
+    container_name: apicatalogo.database
+    environment:
+      POSTGRES_DB: apicatalogo
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_USER: postgres
+    image: postgres:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+    volumes:
+      - type: volume
+        target: PostgresVolumeDataStorage
+        volume: {}
+  apicatalogo:
+    build:
+      context: D:\DEV\Projetos C#\apicatalogo
+      dockerfile: APICatalogo/Dockerfile
+    container_name: apicatalogo.api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "5000"
+      ASPNETCORE_HTTPS_PORTS: "5001"
+    image: apicatalogo
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5000
+        published: "5000"
+        protocol: tcp
+      - mode: ingress
+        target: 5001
+        published: "5001"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\Matthews\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\Matthews\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  common_db:
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: db1,db2
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_USER: postgres
+    image: postgres:12.20
+    networks:
+      app-network: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5436"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: bind
+        source: D:\DEV\Projetos C#\apicatalogo\db.sql
+        target: /docker-entrypoint-initdb.d/db.sql
+        bind:
+          create_host_path: true
+      - type: bind
+        source: D:\DEV\Projetos C#\apicatalogo\postgres-data
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: true
+networks:
+  app-network:
+    name: dockercompose13484724540897623862_app-network
+    driver: bridge`
+  default:
+    name: dockercompose13484724540897623862_default

@@ -42,3 +42,47 @@ D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Asp.Versioning.Mvc.ApiExplorer.dll
 D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Asp.Versioning.Abstractions.dll
 D:\DEV\Projetos em C#\APICatalogo\bin\Debug\Asp.Versioning.Mvc.dll
 D:\DEV\Projetos em C#\APICatalogo\bin\Debug\APICatalogo.xml
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\appsettings.Development.json
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\appsettings.json
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\APICatalogo.deps.json
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\APICatalogo.runtimeconfig.json
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\APICatalogo.exe
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\APICatalogo.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Asp.Versioning.Http.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Asp.Versioning.Mvc.ApiExplorer.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.OpenApi.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.EntityFrameworkCore.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\System.IdentityModel.Tokens.Jwt.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.IdentityModel.Tokens.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\X.PagedList.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.Extensions.Identity.Stores.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.EntityFrameworkCore.Relational.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\AutoMapper.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.Extensions.Identity.Core.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.AspNetCore.JsonPatch.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Asp.Versioning.Abstractions.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Swashbuckle.AspNetCore.Swagger.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Pomelo.EntityFrameworkCore.MySql.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Newtonsoft.Json.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.Extensions.Options.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Asp.Versioning.Mvc.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.IdentityModel.Protocols.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.IdentityModel.Logging.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.IdentityModel.Abstractions.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Newtonsoft.Json.Bson.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\MySqlConnector.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\Microsoft.AspNetCore.Cryptography.Internal.dll
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\APICatalogo.pdb
+D:\DEV\Projetos C#\apicatalogo\bin\Debug\APICatalogo.xml
+D:\DEV\Projetos C#\apicatalogo\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
+D:\DEV\Projetos C#\apicatalogo\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
+D:\DEV\Projetos C#\apicatalogo\obj\Debug\docker-c.35A3FFBA.Up2Date
