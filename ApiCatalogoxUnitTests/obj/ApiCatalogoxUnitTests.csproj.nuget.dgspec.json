@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DEV\\Projetos C#\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj": {}
+    "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj": {}
   },
   "projects": {
-    "D:\\DEV\\Projetos C#\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj": {
+    "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEV\\Projetos C#\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj",
+        "projectUniqueName": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj",
         "projectName": "ApiCatalogoxUnitTests",
-        "projectPath": "D:\\DEV\\Projetos C#\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj",
+        "projectPath": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\ApiCatalogoxUnitTests\\ApiCatalogoxUnitTests.csproj",
         "packagesPath": "C:\\Users\\Matthews\\.nuget\\packages\\",
-        "outputPath": "D:\\DEV\\Projetos C#\\apicatalogo\\ApiCatalogoxUnitTests\\obj\\",
+        "outputPath": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\ApiCatalogoxUnitTests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Matthews\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -29,8 +29,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj": {
-                "projectPath": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj"
+              "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\APICatalogo\\APICatalogo.csproj": {
+                "projectPath": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\APICatalogo\\APICatalogo.csproj"
               }
             }
           }
@@ -91,14 +91,14 @@
         }
       }
     },
-    "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj": {
+    "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\APICatalogo\\APICatalogo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
+        "projectUniqueName": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
         "projectName": "APICatalogo",
-        "projectPath": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
+        "projectPath": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
         "packagesPath": "C:\\Users\\Matthews\\.nuget\\packages\\",
-        "outputPath": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\obj\\",
+        "outputPath": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\APICatalogo\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Matthews\\AppData\\Roaming\\NuGet\\NuGet.Config",

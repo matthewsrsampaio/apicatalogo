@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xzf554VOR5A=",
+  "dgSpecHash": "I680xpOY5+k=",
   "success": true,
-  "projectFilePath": "D:\\DEV\\Projetos C#\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
+  "projectFilePath": "D:\\DEV\\Projetos C#\\apicatalogo\\apicatalogo\\APICatalogo\\APICatalogo.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthews\\.nuget\\packages\\asp.versioning.abstractions\\8.1.0\\asp.versioning.abstractions.8.1.0.nupkg.sha512",
     "C:\\Users\\Matthews\\.nuget\\packages\\asp.versioning.http\\8.1.0\\asp.versioning.http.8.1.0.nupkg.sha512",

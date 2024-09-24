@@ -277,21 +277,24 @@ builder.Services.AddAutoMapper(typeof(ProdutoDTOMappingProfile));
 
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) //Verifico se meu ambiente é o de desenvolvimento
-{
-    app.UseSwagger(); //Habilita o middleware para servir o SWAGGER e é gerado como um endpoint JSON
-    //app.UseSwaggerUI(); //Habilita o middleware de arquivos estáticos
+//if (app.Environment.IsDevelopment()) //Verifico se meu ambiente é o de desenvolvimento
+//{
+//    app.UseSwagger(); //Habilita o middleware para servir o SWAGGER e é gerado como um endpoint JSON
+//    //app.UseSwaggerUI(); //Habilita o middleware de arquivos estáticos
     
-    //Habilitar o SwaggerUI de forma mais específica (nao precisaria no meu caso)
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json",
-            "APICatalogo");
-    });
-    app.ConfigureExceptionHandler();
-    //app.UseDeveloperExceptionPage();
-}
+//    //Habilitar o SwaggerUI de forma mais específica (nao precisaria no meu caso)
+//    app.UseSwaggerUI(c =>
+//    {
+//        c.SwaggerEndpoint("/swagger/v1/swagger.json",
+//            "APICatalogo");
+//    });
+//    app.ConfigureExceptionHandler();
+//    //app.UseDeveloperExceptionPage();
+//}
 
 app.UseHttpsRedirection(); //Define o middleware para redirecionar as requisições HTTP para HTTPS
 app.UseStaticFiles(); //habilita o middleware de arquivos estáticos

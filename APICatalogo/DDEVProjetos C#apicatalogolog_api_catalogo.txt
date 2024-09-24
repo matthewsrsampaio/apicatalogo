@@ -1,9 +1,0 @@
-Warning: UsingInMemoryRepository - Using an in-memory repository. Keys will not be persisted to storage.
-Warning: UsingEphemeralKeyRepository - Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits.
-Warning: NoXMLEncryptorConfiguredKeyMayBePersistedToStorageInUnencryptedForm - No XML encryptor configured. Key {277e5095-598b-4e59-b09e-4debb532dee9} may be persisted to storage in unencrypted form.
-Warning: WebRootPathNotFound - The WebRootPath was not found: /app/wwwroot. Static files may be unavailable.
-Information: ListeningOnAddress - Now listening on: http://[::]:8080
-Information: ListeningOnAddress - Now listening on: https://[::]:8081
-Information: 0 - Application started. Press Ctrl+C to shut down.
-Information: 0 - Hosting environment: Development
-Information: 0 - Content root path: /app
